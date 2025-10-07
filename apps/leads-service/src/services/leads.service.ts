@@ -5,17 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Between } from 'typeorm';
-import { Lead, EstadoLead, FuenteLead } from './entities';
-import {
-  CreateLeadDto,
-  UpdateLeadDto,
-  CreateEstadoLeadDto,
-  CreateFuenteLeadDto,
-} from './dto';
+import { Lead, EstadoLead, FuenteLead } from '../entities';
+import { CreateLeadDto, UpdateLeadDto } from '../dto';
 import { PrioridadLead } from 'y/common';
 
 @Injectable()
-export class LeadsServiceService {
+export class LeadsService {
   constructor(
     @InjectRepository(Lead)
     private leadRepository: Repository<Lead>,
@@ -25,8 +20,7 @@ export class LeadsServiceService {
     private fuenteLeadRepository: Repository<FuenteLead>,
   ) {}
 
-  // CRUD de Leads
-  async createLead(createLeadDto: CreateLeadDto): Promise<Lead> {
+  async create(createLeadDto: CreateLeadDto): Promise<Lead> {
     // Verificar que el estado y la fuente existen
     const estado = await this.estadoLeadRepository.findOne({
       where: { id: createLeadDto.idEstado, estaActivo: true },
@@ -57,7 +51,7 @@ export class LeadsServiceService {
     return await this.leadRepository.save(lead);
   }
 
-  async getAllLeads(
+  async findAll(
     page: number = 1,
     limit: number = 10,
     filters?: any,
@@ -97,7 +91,7 @@ export class LeadsServiceService {
     };
   }
 
-  async getLeadById(id: string): Promise<Lead> {
+  async findOne(id: string): Promise<Lead> {
     const lead = await this.leadRepository.findOne({
       where: { id, estaActivo: true },
       relations: ['estado', 'fuente'],
@@ -110,8 +104,8 @@ export class LeadsServiceService {
     return lead;
   }
 
-  async updateLead(id: string, updateLeadDto: UpdateLeadDto): Promise<Lead> {
-    const lead = await this.getLeadById(id);
+  async update(id: string, updateLeadDto: UpdateLeadDto): Promise<Lead> {
+    const lead = await this.findOne(id);
 
     // Verificar estado si se está actualizando
     if (updateLeadDto.idEstado) {
@@ -137,20 +131,20 @@ export class LeadsServiceService {
     return await this.leadRepository.save(lead);
   }
 
-  async deleteLead(id: string): Promise<void> {
-    const lead = await this.getLeadById(id);
+  async remove(id: string): Promise<void> {
+    const lead = await this.findOne(id);
     lead.estaActivo = false;
     await this.leadRepository.save(lead);
   }
 
-  async assignLead(leadId: string, usuarioId: string): Promise<Lead> {
-    const lead = await this.getLeadById(leadId);
+  async assign(leadId: string, usuarioId: string): Promise<Lead> {
+    const lead = await this.findOne(leadId);
     lead.asignadoAUsuario = usuarioId;
     return await this.leadRepository.save(lead);
   }
 
-  async updateLeadStatus(leadId: string, estadoId: string): Promise<Lead> {
-    const lead = await this.getLeadById(leadId);
+  async updateStatus(leadId: string, estadoId: string): Promise<Lead> {
+    const lead = await this.findOne(leadId);
 
     const estado = await this.estadoLeadRepository.findOne({
       where: { id: estadoId, estaActivo: true },
@@ -166,7 +160,7 @@ export class LeadsServiceService {
     return await this.leadRepository.save(lead);
   }
 
-  async getLeadsByUser(usuarioId: string): Promise<Lead[]> {
+  async findByUser(usuarioId: string): Promise<Lead[]> {
     return await this.leadRepository.find({
       where: { asignadoAUsuario: usuarioId, estaActivo: true },
       relations: ['estado', 'fuente'],
@@ -174,7 +168,7 @@ export class LeadsServiceService {
     });
   }
 
-  async getLeadsWithFollowupToday(): Promise<Lead[]> {
+  async getFollowupToday(): Promise<Lead[]> {
     const today = new Date();
     const startOfDay = new Date(
       today.getFullYear(),
@@ -199,70 +193,7 @@ export class LeadsServiceService {
     });
   }
 
-  // CRUD de Estados de Lead
-  async createEstadoLead(
-    createEstadoDto: CreateEstadoLeadDto,
-  ): Promise<EstadoLead> {
-    const estado = this.estadoLeadRepository.create(createEstadoDto);
-    return await this.estadoLeadRepository.save(estado);
-  }
-
-  async getAllEstadosLead(): Promise<EstadoLead[]> {
-    return await this.estadoLeadRepository.find({
-      where: { estaActivo: true },
-      order: { ordenProceso: 'ASC' },
-    });
-  }
-
-  async updateEstadoLead(
-    id: string,
-    updateData: Partial<CreateEstadoLeadDto>,
-  ): Promise<EstadoLead> {
-    const estado = await this.estadoLeadRepository.findOne({
-      where: { id, estaActivo: true },
-    });
-
-    if (!estado) {
-      throw new NotFoundException('Estado no encontrado');
-    }
-
-    Object.assign(estado, updateData);
-    return await this.estadoLeadRepository.save(estado);
-  }
-
-  // CRUD de Fuentes de Lead
-  async createFuenteLead(
-    createFuenteDto: CreateFuenteLeadDto,
-  ): Promise<FuenteLead> {
-    const fuente = this.fuenteLeadRepository.create(createFuenteDto);
-    return await this.fuenteLeadRepository.save(fuente);
-  }
-
-  async getAllFuentesLead(): Promise<FuenteLead[]> {
-    return await this.fuenteLeadRepository.find({
-      where: { estaActivo: true },
-      order: { nombre: 'ASC' },
-    });
-  }
-
-  async updateFuenteLead(
-    id: string,
-    updateData: Partial<CreateFuenteLeadDto>,
-  ): Promise<FuenteLead> {
-    const fuente = await this.fuenteLeadRepository.findOne({
-      where: { id, estaActivo: true },
-    });
-
-    if (!fuente) {
-      throw new NotFoundException('Fuente no encontrada');
-    }
-
-    Object.assign(fuente, updateData);
-    return await this.fuenteLeadRepository.save(fuente);
-  }
-
-  // Dashboard y Estadísticas
-  async getLeadStats(): Promise<any> {
+  async getStats(): Promise<any> {
     const totalLeads = await this.leadRepository.count({
       where: { estaActivo: true },
     });
