@@ -1,50 +1,49 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseEntity, TipoDocumento } from 'y/common';
-import { Cliente } from './cliente.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity('beneficiario')
-export class Beneficiario extends BaseEntity {
-  @Column({ type: 'varchar', length: 100 })
+@Entity('beneficiarios')
+export class Beneficiario {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  clienteId: number;
+
+  @Column()
   nombre: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column()
   apellido: string;
 
-  @Column({ type: 'varchar', length: 20, name: 'documento_identidad' })
-  documentoIdentidad: string;
+  @Column()
+  numeroDocumento: string;
 
-  @Column({
-    type: 'enum',
-    enum: TipoDocumento,
-    name: 'tipo_documento',
-  })
-  tipoDocumento: TipoDocumento;
+  @Column()
+  tipoDocumento: string;
 
-  @Column({ type: 'date', nullable: true, name: 'fecha_nacimiento' })
+  @Column({ type: 'date', nullable: true })
   fechaNacimiento?: Date;
 
-  @Column({ type: 'varchar', length: 50, name: 'relacion_con_asegurado' })
+  @Column()
   relacionConAsegurado: string;
 
-  @Column({
-    type: 'decimal',
-    precision: 5,
-    scale: 2,
-    default: 100.0,
-    name: 'porcentaje_beneficio',
-  })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 100.0 })
   porcentajeBeneficio: number;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ nullable: true })
   telefono?: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   direccion?: string;
 
-  @Column({ type: 'uuid', name: 'id_cliente' })
-  idCliente: string;
+  @CreateDateColumn()
+  fechaCreacion: Date;
 
-  @ManyToOne(() => Cliente)
-  @JoinColumn({ name: 'id_cliente' })
-  cliente: Cliente;
+  @UpdateDateColumn()
+  fechaActualizacion: Date;
 }

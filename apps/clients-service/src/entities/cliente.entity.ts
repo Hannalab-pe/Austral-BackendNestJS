@@ -1,118 +1,76 @@
 import {
   Entity,
+  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { BaseEntity, TipoDocumento, EstadoCivil } from 'y/common';
 
-@Entity('cliente')
-@Index('idx_cliente_activo', ['estaActivo'])
-@Index('idx_cliente_documento', ['documentoIdentidad'])
-@Index('idx_cliente_email', ['email'])
-@Index('idx_cliente_cumpleanos', ['fechaNacimiento'])
-@Index('idx_cliente_broker', ['brokerAsignado'])
-export class Cliente extends BaseEntity {
-  @Column({ type: 'varchar', length: 100 })
+@Entity('clientes')
+export class Cliente {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   nombre: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column()
   apellido: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column()
   telefono: string;
 
-  @Column({
-    type: 'varchar',
-    length: 20,
-    nullable: true,
-    name: 'telefono_secundario',
-  })
+  @Column({ nullable: true })
   telefonoSecundario?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 20,
-    unique: true,
-    name: 'documento_identidad',
-  })
-  documentoIdentidad: string;
+  @Column({ unique: true })
+  numeroDocumento: string;
 
-  @Column({
-    type: 'enum',
-    enum: TipoDocumento,
-    name: 'tipo_documento',
-  })
-  tipoDocumento: TipoDocumento;
+  @Column()
+  tipoDocumento: string;
 
-  @Column({ type: 'date', name: 'fecha_nacimiento' })
+  @Column({ type: 'date' })
   fechaNacimiento: Date;
 
-  @Column({ type: 'text' })
+  @Column('text')
   direccion: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ nullable: true })
   distrito?: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ nullable: true })
   provincia?: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ nullable: true })
   departamento?: string;
 
-  @Column({ type: 'varchar', length: 150, nullable: true })
+  @Column({ nullable: true })
   ocupacion?: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Column({ nullable: true })
   empresa?: string;
 
-  @Column({
-    type: 'enum',
-    enum: EstadoCivil,
-    nullable: true,
-    name: 'estado_civil',
-  })
-  estadoCivil?: EstadoCivil;
+  @Column({ nullable: true })
+  estadoCivil?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 200,
-    nullable: true,
-    name: 'contacto_emergencia_nombre',
-  })
+  @Column({ nullable: true })
   contactoEmergenciaNombre?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 20,
-    nullable: true,
-    name: 'contacto_emergencia_telefono',
-  })
+  @Column({ nullable: true })
   contactoEmergenciaTelefono?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 50,
-    nullable: true,
-    name: 'contacto_emergencia_relacion',
-  })
+  @Column({ nullable: true })
   contactoEmergenciaRelacion?: string;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    name: 'fecha_registro',
-  })
-  fechaRegistro: Date;
+  @Column({ default: true })
+  activo: boolean;
 
-  @Column({ type: 'uuid', nullable: true, name: 'id_lead' })
-  idLead?: string;
+  @CreateDateColumn()
+  fechaCreacion: Date;
 
-  @Column({ type: 'uuid', nullable: true, name: 'broker_asignado' })
-  brokerAsignado?: string;
+  @UpdateDateColumn()
+  fechaActualizacion: Date;
 }
