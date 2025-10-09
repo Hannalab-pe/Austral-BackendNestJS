@@ -5,8 +5,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthServiceController } from './auth-service.controller';
 import { AuthServiceService } from './auth-service.service';
-import { Usuario, Asociado } from './entities';
-import { Rol, Permiso, RolPermiso, getDatabaseConfig } from 'y/common';
+import { RolesController } from './controllers/roles.controller';
+import { RolesService } from './services/roles.service';
+import { Usuario } from './entities/usuario.entity';
+import { Rol } from './entities/rol.entity';
 import { JwtStrategy } from './strategies';
 
 @Module({
@@ -15,11 +17,21 @@ import { JwtStrategy } from './strategies';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST', 'localhost'),
+        port: configService.get('DB_PORT', 5432),
+        username: configService.get('DB_USERNAME', 'postgres'),
+        password: configService.get('DB_PASSWORD', ''),
+        database: configService.get('DB_NAME', 'austral_seguros'),
+        entities: [Usuario, Rol],
+        synchronize: false, // NO modificar la BD existente
+        logging: configService.get('NODE_ENV') === 'development',
+      }),
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        getDatabaseConfig(configService),
     }),
-    TypeOrmModule.forFeature([Usuario, Rol, Permiso, RolPermiso, Asociado]),
+    TypeOrmModule.forFeature([Usuario, Rol]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -31,8 +43,8 @@ import { JwtStrategy } from './strategies';
       }),
     }),
   ],
-  controllers: [AuthServiceController],
-  providers: [AuthServiceService, JwtStrategy],
-  exports: [AuthServiceService, JwtModule],
+  controllers: [AuthServiceController, RolesController],
+  providers: [AuthServiceService, RolesService, JwtStrategy],
+  exports: [AuthServiceService, RolesService, JwtModule],
 })
 export class AuthServiceModule {}

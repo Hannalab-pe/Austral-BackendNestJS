@@ -27,10 +27,6 @@ import { AuthProxyService } from './services/auth-proxy.service';
     AuthController,
     HealthController,
   ],
-  providers: [
-    ApiGatewayService,
-    ProxyService,
-    AuthProxyService,
-  ],
+  providers: [ApiGatewayService, ProxyService, AuthProxyService],
 })
 export class ApiGatewayModule {}

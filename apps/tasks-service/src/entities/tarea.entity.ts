@@ -6,10 +6,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('tareas')
+@Entity('tarea') // Cambiar a 'tarea' para coincidir con la BD
 export class Tarea {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid') // Tu BD usa UUID
+  id_tarea: string; // Campo real de la BD
 
   @Column()
   titulo: string;
@@ -17,36 +17,51 @@ export class Tarea {
   @Column({ nullable: true })
   descripcion: string;
 
-  @Column({ default: 'PENDIENTE' })
-  estado: string;
+  @Column({ nullable: true })
+  tipo_tarea: string; // Campo real de la BD
 
   @Column({ default: 'MEDIA' })
   prioridad: string;
 
-  @Column({ nullable: true })
-  fechaVencimiento: Date;
+  @Column({ type: 'timestamp' })
+  fecha_inicio: Date; // Campo real de la BD
 
-  @Column({ nullable: true })
-  fechaCompletada: Date;
+  @Column({ type: 'timestamp' })
+  fecha_vencimiento: Date; // Campo real de la BD
 
-  @Column()
-  usuarioAsignadoId: number;
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_completada: Date;
 
-  @Column()
-  usuarioCreadorId: number;
+  @Column({ default: 'PENDIENTE' })
+  estado: string;
 
-  @Column({ nullable: true })
-  clienteId: number;
+  @Column({ default: 0 })
+  progreso: number; // Campo real de la BD
 
-  @Column({ nullable: true })
-  leadId: number;
+  @Column({ type: 'uuid', nullable: true })
+  id_lead: string; // Campo real de la BD
+
+  @Column({ type: 'uuid', nullable: true })
+  id_cliente: string; // Campo real de la BD
+
+  @Column({ type: 'uuid', nullable: true })
+  id_poliza: string; // Campo real de la BD
+
+  @Column({ type: 'uuid' })
+  creada_por: string; // Campo real de la BD
+
+  @Column({ type: 'uuid' })
+  asignada_a: string; // Campo real de la BD
+
+  @Column({ default: false })
+  recordatorio_enviado: boolean; // Campo real de la BD
+
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_recordatorio: Date; // Campo real de la BD
 
   @Column({ nullable: true })
   notas: string;
 
   @CreateDateColumn()
-  fechaCreacion: Date;
-
-  @UpdateDateColumn()
-  fechaActualizacion: Date;
+  fecha_creacion: Date; // Campo real de la BD
 }

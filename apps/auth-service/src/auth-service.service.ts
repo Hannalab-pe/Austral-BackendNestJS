@@ -8,41 +8,40 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Usuario, Asociado } from './entities';
-import { Rol, Permiso, CreateUsuarioDto } from 'y/common';
-import { LoginDto, ChangePasswordDto, ResetPasswordDto } from './dto';
+import { Usuario } from './entities/usuario.entity';
+import { RolesService } from './services/roles.service';
+import {
+  LoginDto,
+  RegisterDto,
+  ChangePasswordDto,
+  AuthResponseDto,
+} from './dto';
 
 @Injectable()
 export class AuthServiceService {
   constructor(
     @InjectRepository(Usuario)
     private usuarioRepository: Repository<Usuario>,
-    @InjectRepository(Rol)
-    private rolRepository: Repository<Rol>,
-    @InjectRepository(Permiso)
-    private permisoRepository: Repository<Permiso>,
-    @InjectRepository(Asociado)
-    private asociadoRepository: Repository<Asociado>,
+    private rolesService: RolesService,
     private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const { usuario, contrasena } = loginDto;
 
     // Buscar usuario por email o nombre de usuario
     const user = await this.usuarioRepository.findOne({
       where: [
-        { email: usuario, estaActivo: true },
-        { nombreUsuario: usuario, estaActivo: true },
+        { email: usuario, esta_activo: true },
+        { nombre_usuario: usuario, esta_activo: true },
       ],
-      relations: ['rol'],
     });
 
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    if (user.cuentaBloqueada) {
+    if (user.cuenta_bloqueada) {
       throw new UnauthorizedException(
         'Cuenta bloqueada. Contacte al administrador',
       );
@@ -56,11 +55,11 @@ export class AuthServiceService {
 
     if (!esContrasenaValida) {
       // Incrementar intentos fallidos
-      user.intentosFallidos += 1;
+      user.intentos_fallidos += 1;
 
       // Bloquear cuenta después de 5 intentos
-      if (user.intentosFallidos >= 5) {
-        user.cuentaBloqueada = true;
+      if (user.intentos_fallidos >= 5) {
+        user.cuenta_bloqueada = true;
       }
 
       await this.usuarioRepository.save(user);
@@ -68,107 +67,40 @@ export class AuthServiceService {
     }
 
     // Resetear intentos fallidos en login exitoso
-    user.intentosFallidos = 0;
-    user.ultimoAcceso = new Date();
+    user.intentos_fallidos = 0;
+    user.ultimo_acceso = new Date();
     await this.usuarioRepository.save(user);
 
-    // Obtener permisos del usuario
-    const permisos = await this.getPermisosUsuario(user.idRol);
-
+    // Crear JWT payload
     const payload = {
-      sub: user.id,
+      sub: user.id_usuario,
       email: user.email,
-      nombreUsuario: user.nombreUsuario,
-      nombre: `${user.nombre} ${user.apellido}`,
-      rol: user.rol.nombre,
-      permisos: permisos.map((p) => `${p.modulo}:${p.accion}`),
+      nombre_usuario: user.nombre_usuario,
+      nombre_completo: `${user.nombre} ${user.apellido}`,
+      id_rol: user.id_rol,
     };
 
     const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(
-      { sub: user.id },
-      { expiresIn: '7d' },
-    );
 
     return {
+      access_token: accessToken,
       user: {
-        id: user.id,
-        nombreUsuario: user.nombreUsuario,
+        id_usuario: user.id_usuario,
+        nombre_usuario: user.nombre_usuario,
         email: user.email,
         nombre: user.nombre,
         apellido: user.apellido,
-        rol: user.rol.nombre,
+        id_rol: user.id_rol,
       },
-      access_token: accessToken,
-      refresh_token: refreshToken,
     };
   }
 
-  async refreshToken(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken);
-      const user = await this.usuarioRepository.findOne({
-        where: { id: payload.sub, estaActivo: true },
-        relations: ['rol'],
-      });
-
-      if (!user) {
-        throw new UnauthorizedException('Token inválido');
-      }
-
-      const permisos = await this.getPermisosUsuario(user.idRol);
-
-      const newPayload = {
-        sub: user.id,
-        email: user.email,
-        nombreUsuario: user.nombreUsuario,
-        nombre: `${user.nombre} ${user.apellido}`,
-        rol: user.rol.nombre,
-        permisos: permisos.map((p) => `${p.modulo}:${p.accion}`),
-      };
-
-      return {
-        access_token: this.jwtService.sign(newPayload),
-      };
-    } catch (error) {
-      throw new UnauthorizedException('Token de actualización inválido');
-    }
-  }
-
-  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
-    const { contrasenaActual, contrasenaNueva } = changePasswordDto;
-
-    const user = await this.usuarioRepository.findOne({
-      where: { id: userId, estaActivo: true },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Usuario no encontrado');
-    }
-
-    const esContrasenaActualValida = await bcrypt.compare(
-      contrasenaActual,
-      user.contrasena,
-    );
-
-    if (!esContrasenaActualValida) {
-      throw new BadRequestException('Contraseña actual incorrecta');
-    }
-
-    const hashedPassword = await bcrypt.hash(contrasenaNueva, 12);
-    user.contrasena = hashedPassword;
-
-    await this.usuarioRepository.save(user);
-
-    return { message: 'Contraseña actualizada exitosamente' };
-  }
-
-  async createUser(createUsuarioDto: CreateUsuarioDto) {
+  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     // Verificar si el email ya existe
     const existingUser = await this.usuarioRepository.findOne({
       where: [
-        { email: createUsuarioDto.email },
-        { nombreUsuario: createUsuarioDto.nombreUsuario },
+        { email: registerDto.email },
+        { nombre_usuario: registerDto.nombre_usuario },
       ],
     });
 
@@ -179,67 +111,94 @@ export class AuthServiceService {
     }
 
     // Verificar que el rol existe
-    const rol = await this.rolRepository.findOne({
-      where: { id: createUsuarioDto.idRol, estaActivo: true },
-    });
-
+    const rol = await this.rolesService.findOne(registerDto.id_rol);
     if (!rol) {
       throw new BadRequestException('Rol no válido');
     }
 
     // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(createUsuarioDto.contrasena, 12);
+    const hashedPassword = await bcrypt.hash(registerDto.contrasena, 12);
 
+    // Crear nuevo usuario
     const newUser = this.usuarioRepository.create({
-      ...createUsuarioDto,
+      ...registerDto,
       contrasena: hashedPassword,
+      esta_activo: true,
+      intentos_fallidos: 0,
+      cuenta_bloqueada: false,
     });
 
     const savedUser = await this.usuarioRepository.save(newUser);
 
-    // Retornar usuario sin contraseña
-    const { contrasena, ...userWithoutPassword } = savedUser;
-    return userWithoutPassword;
+    // Crear JWT para el nuevo usuario
+    const payload = {
+      sub: savedUser.id_usuario,
+      email: savedUser.email,
+      nombre_usuario: savedUser.nombre_usuario,
+      nombre_completo: `${savedUser.nombre} ${savedUser.apellido}`,
+      id_rol: savedUser.id_rol,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      access_token: accessToken,
+      user: {
+        id_usuario: savedUser.id_usuario,
+        nombre_usuario: savedUser.nombre_usuario,
+        email: savedUser.email,
+        nombre: savedUser.nombre,
+        apellido: savedUser.apellido,
+        id_rol: savedUser.id_rol,
+      },
+    };
   }
 
-  async getUserProfile(userId: string) {
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const { contrasena_actual, contrasena_nueva } = changePasswordDto;
+
     const user = await this.usuarioRepository.findOne({
-      where: { id: userId, estaActivo: true },
-      relations: ['rol', 'supervisor'],
-      select: {
-        id: true,
-        nombreUsuario: true,
-        email: true,
-        nombre: true,
-        apellido: true,
-        telefono: true,
-        documentoIdentidad: true,
-        ultimoAcceso: true,
-        fechaCreacion: true,
-        rol: { id: true, nombre: true, descripcion: true },
-        supervisor: { id: true, nombre: true, apellido: true },
-      },
+      where: { id_usuario: userId, esta_activo: true },
     });
 
     if (!user) {
       throw new BadRequestException('Usuario no encontrado');
     }
 
-    return user;
+    const esContrasenaActualValida = await bcrypt.compare(
+      contrasena_actual,
+      user.contrasena,
+    );
+
+    if (!esContrasenaActualValida) {
+      throw new BadRequestException('Contraseña actual incorrecta');
+    }
+
+    const hashedPassword = await bcrypt.hash(contrasena_nueva, 12);
+    user.contrasena = hashedPassword;
+
+    await this.usuarioRepository.save(user);
+
+    return { message: 'Contraseña actualizada exitosamente' };
   }
 
-  private async getPermisosUsuario(rolId: string): Promise<Permiso[]> {
-    return await this.permisoRepository
-      .createQueryBuilder('permiso')
-      .innerJoin('rol_permiso', 'rp', 'rp.id_permiso = permiso.id')
-      .where('rp.id_rol = :rolId', { rolId })
-      .getMany();
+  async getUserProfile(userId: string) {
+    const user = await this.usuarioRepository.findOne({
+      where: { id_usuario: userId, esta_activo: true },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Usuario no encontrado');
+    }
+
+    // Retornar usuario sin contraseña
+    const { contrasena, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async validateUser(payload: any): Promise<any> {
     const user = await this.usuarioRepository.findOne({
-      where: { id: payload.sub, estaActivo: true },
-      relations: ['rol'],
+      where: { id_usuario: payload.sub, esta_activo: true },
     });
 
     if (!user) {
@@ -247,11 +206,11 @@ export class AuthServiceService {
     }
 
     return {
-      userId: user.id,
+      userId: user.id_usuario,
       email: user.email,
-      nombreUsuario: user.nombreUsuario,
-      nombre: `${user.nombre} ${user.apellido}`,
-      rol: user.rol.nombre,
+      nombre_usuario: user.nombre_usuario,
+      nombre_completo: `${user.nombre} ${user.apellido}`,
+      id_rol: user.id_rol,
     };
   }
 }

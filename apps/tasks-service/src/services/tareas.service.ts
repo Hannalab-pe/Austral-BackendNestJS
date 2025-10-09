@@ -19,7 +19,7 @@ export class TareasService {
     const [data, total] = await this.tareaRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { id: 'DESC' },
+      order: { id_tarea: 'DESC' }, // Usar el campo correcto
     });
 
     return {
@@ -31,9 +31,9 @@ export class TareasService {
     };
   }
 
-  async findOne(id: number): Promise<Tarea> {
+  async findOne(id: string): Promise<Tarea> {
     const tarea = await this.tareaRepository.findOne({
-      where: { id },
+      where: { id_tarea: id },
     });
 
     if (!tarea) {
@@ -55,59 +55,59 @@ export class TareasService {
     }
   }
 
-  async update(id: number, updateTareaDto: UpdateTareaDto): Promise<Tarea> {
+  async update(id: string, updateTareaDto: UpdateTareaDto): Promise<Tarea> {
     const tarea = await this.findOne(id);
 
     Object.assign(tarea, updateTareaDto);
     return await this.tareaRepository.save(tarea);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const tarea = await this.findOne(id);
     await this.tareaRepository.remove(tarea);
   }
 
-  async findByUsuarioAsignado(usuarioId: number): Promise<Tarea[]> {
+  async findByUsuarioAsignado(usuarioId: string): Promise<Tarea[]> {
     return await this.tareaRepository.find({
-      where: { usuarioAsignadoId: usuarioId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { asignada_a: usuarioId },
+      order: { fecha_vencimiento: 'ASC' },
     });
   }
 
-  async findByUsuarioCreador(usuarioId: number): Promise<Tarea[]> {
+  async findByUsuarioCreador(usuarioId: string): Promise<Tarea[]> {
     return await this.tareaRepository.find({
-      where: { usuarioCreadorId: usuarioId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { creada_por: usuarioId },
+      order: { fecha_vencimiento: 'ASC' },
     });
   }
 
-  async findByCliente(clienteId: number): Promise<Tarea[]> {
+  async findByCliente(clienteId: string): Promise<Tarea[]> {
     return await this.tareaRepository.find({
-      where: { clienteId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { id_cliente: clienteId },
+      order: { fecha_vencimiento: 'ASC' },
     });
   }
 
   async findByEstado(estado: string): Promise<Tarea[]> {
     return await this.tareaRepository.find({
       where: { estado },
-      order: { fechaVencimiento: 'ASC' },
+      order: { fecha_vencimiento: 'ASC' },
     });
   }
 
   async findByPrioridad(prioridad: string): Promise<Tarea[]> {
     return await this.tareaRepository.find({
       where: { prioridad },
-      order: { fechaVencimiento: 'ASC' },
+      order: { fecha_vencimiento: 'ASC' },
     });
   }
 
   async findOverdueTasks(): Promise<Tarea[]> {
     return await this.tareaRepository
       .createQueryBuilder('tarea')
-      .where('tarea.fechaVencimiento < :today', { today: new Date() })
+      .where('tarea.fecha_vencimiento < :today', { today: new Date() })
       .andWhere('tarea.estado != :estado', { estado: 'COMPLETADA' })
-      .orderBy('tarea.fechaVencimiento', 'ASC')
+      .orderBy('tarea.fecha_vencimiento', 'ASC')
       .getMany();
   }
 
@@ -129,12 +129,12 @@ export class TareasService {
 
     return await this.tareaRepository
       .createQueryBuilder('tarea')
-      .where('tarea.fechaVencimiento BETWEEN :startOfDay AND :endOfDay', {
+      .where('tarea.fecha_vencimiento BETWEEN :startOfDay AND :endOfDay', {
         startOfDay,
         endOfDay,
       })
       .andWhere('tarea.estado != :estado', { estado: 'COMPLETADA' })
-      .orderBy('tarea.fechaVencimiento', 'ASC')
+      .orderBy('tarea.fecha_vencimiento', 'ASC')
       .getMany();
   }
 }
