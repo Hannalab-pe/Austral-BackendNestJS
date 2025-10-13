@@ -4,7 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { EstadoLead } from './estado-lead.entity';
+import { FuenteLead } from './fuente-lead.entity';
 
 @Entity('lead')
 @Index('idx_lead_activo', ['esta_activo'])
@@ -69,4 +73,12 @@ export class Lead {
 
   @CreateDateColumn()
   fecha_creacion: Date;
+
+  @ManyToOne(() => EstadoLead)
+  @JoinColumn({ name: 'id_estado' })
+  estado: EstadoLead;
+
+  @ManyToOne(() => FuenteLead)
+  @JoinColumn({ name: 'id_fuente' })
+  fuente: FuenteLead;
 }

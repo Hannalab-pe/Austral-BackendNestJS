@@ -47,4 +47,12 @@ export class LeadsService {
 
     return await this.leadRepository.save(lead);
   }
+
+  async findAll(): Promise<Lead[]> {
+    return await this.leadRepository.find({
+      relations: ['estado', 'fuente'],
+      where: { esta_activo: true },
+      order: { fecha_creacion: 'DESC' },
+    });
+  }
 }
