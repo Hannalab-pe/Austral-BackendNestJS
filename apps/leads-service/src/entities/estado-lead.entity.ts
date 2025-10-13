@@ -1,21 +1,26 @@
-import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { BaseEntity, PrioridadLead } from 'y/common';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 @Entity('estado_lead')
 @Index('idx_estado_lead_nombre', ['nombre'])
-export class EstadoLead extends BaseEntity {
+export class EstadoLead {
+  @PrimaryGeneratedColumn('uuid')
+  id_estado: string;
+
   @Column({ type: 'varchar', length: 100, unique: true })
   nombre: string;
 
   @Column({ type: 'text', nullable: true })
   descripcion?: string;
 
-  @Column({ type: 'varchar', length: 7, default: '#3B82F6', name: 'color_hex' })
-  colorHex: string;
+  @Column({ type: 'varchar', length: 7, default: '#3B82F6' })
+  color_hex: string;
 
-  @Column({ type: 'int', default: 1, name: 'orden_proceso' })
-  ordenProceso: number;
+  @Column({ type: 'int', default: 1 })
+  orden_proceso: number;
 
-  @Column({ type: 'boolean', default: false, name: 'es_estado_final' })
-  esEstadoFinal: boolean;
+  @Column({ type: 'boolean', default: false })
+  es_estado_final: boolean;
+
+  @Column({ type: 'boolean', default: true })
+  esta_activo: boolean;
 }

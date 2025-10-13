@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EstadoLead } from '../entities';
-import { CreateEstadoLeadDto } from '../dto';
+import { CreateEstadoLeadDto, UpdateEstadoLeadDto } from '../dto/leads.dto';
 
 @Injectable()
 export class EstadosLeadService {
@@ -18,14 +18,14 @@ export class EstadosLeadService {
 
   async findAll(): Promise<EstadoLead[]> {
     return await this.estadoLeadRepository.find({
-      where: { estaActivo: true },
-      order: { ordenProceso: 'ASC' },
+      where: { esta_activo: true },
+      order: { orden_proceso: 'ASC' },
     });
   }
 
   async findOne(id: string): Promise<EstadoLead> {
     const estado = await this.estadoLeadRepository.findOne({
-      where: { id, estaActivo: true },
+      where: { id_estado: id, esta_activo: true },
     });
 
     if (!estado) {
@@ -37,7 +37,7 @@ export class EstadosLeadService {
 
   async update(
     id: string,
-    updateData: Partial<CreateEstadoLeadDto>,
+    updateData: UpdateEstadoLeadDto,
   ): Promise<EstadoLead> {
     const estado = await this.findOne(id);
     Object.assign(estado, updateData);
@@ -46,7 +46,7 @@ export class EstadosLeadService {
 
   async remove(id: string): Promise<void> {
     const estado = await this.findOne(id);
-    estado.estaActivo = false;
+    estado.esta_activo = false;
     await this.estadoLeadRepository.save(estado);
   }
 }

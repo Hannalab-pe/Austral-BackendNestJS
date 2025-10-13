@@ -1,8 +1,15 @@
-import { Entity, Column } from 'typeorm';
-import { BaseEntity } from 'y/common';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity('fuente_lead')
-export class FuenteLead extends BaseEntity {
+export class FuenteLead {
+  @PrimaryGeneratedColumn('uuid')
+  id_fuente: string;
+
   @Column({ type: 'varchar', length: 100 })
   nombre: string;
 
@@ -11,4 +18,10 @@ export class FuenteLead extends BaseEntity {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   tipo?: string;
+
+  @Column({ type: 'boolean', default: true })
+  esta_activo: boolean;
+
+  @CreateDateColumn()
+  fecha_creacion: Date;
 }

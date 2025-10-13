@@ -1,16 +1,21 @@
-import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { BaseEntity, PrioridadLead } from 'y/common';
-import { EstadoLead } from './estado-lead.entity';
-import { FuenteLead } from './fuente-lead.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 
 @Entity('lead')
-@Index('idx_lead_activo', ['estaActivo'])
-@Index('idx_lead_asignado', ['asignadoAUsuario'])
-@Index('idx_lead_estado', ['idEstado'])
-@Index('idx_lead_seguimiento', ['proximaFechaSeguimiento'])
+@Index('idx_lead_activo', ['esta_activo'])
+@Index('idx_lead_asignado', ['asignado_a_usuario'])
+@Index('idx_lead_estado', ['id_estado'])
+@Index('idx_lead_seguimiento', ['proxima_fecha_seguimiento'])
 @Index('idx_lead_telefono', ['telefono'])
-@Index('idx_lead_cumpleanos', ['fechaNacimiento'])
-export class Lead extends BaseEntity {
+export class Lead {
+  @PrimaryGeneratedColumn('uuid')
+  id_lead: string;
+
   @Column({ type: 'varchar', length: 100 })
   nombre: string;
 
@@ -23,70 +28,45 @@ export class Lead extends BaseEntity {
   @Column({ type: 'varchar', length: 20 })
   telefono: string;
 
-  @Column({ type: 'date', nullable: true, name: 'fecha_nacimiento' })
-  fechaNacimiento?: Date;
+  @Column({ type: 'date', nullable: true })
+  fecha_nacimiento?: Date;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: true,
-    name: 'tipo_seguro_interes',
-  })
-  tipoSeguroInteres?: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  tipo_seguro_interes?: string;
 
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    nullable: true,
-    name: 'presupuesto_aproximado',
-  })
-  presupuestoAproximado?: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  presupuesto_aproximado?: number;
 
   @Column({ type: 'text', nullable: true })
   notas?: string;
 
-  @Column({ type: 'int', default: 0, name: 'puntaje_calificacion' })
-  puntajeCalificacion: number;
+  @Column({ type: 'int', default: 0 })
+  puntaje_calificacion: number;
 
-  @Column({
-    type: 'enum',
-    enum: PrioridadLead,
-    default: PrioridadLead.MEDIA,
-  })
-  prioridad: PrioridadLead;
+  @Column({ type: 'varchar', length: 20, default: 'MEDIA' })
+  prioridad: string;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    name: 'fecha_primer_contacto',
-  })
-  fechaPrimerContacto: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  fecha_primer_contacto: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'fecha_ultimo_contacto' })
-  fechaUltimoContacto?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_ultimo_contacto?: Date;
 
-  @Column({
-    type: 'timestamp',
-    nullable: true,
-    name: 'proxima_fecha_seguimiento',
-  })
-  proximaFechaSeguimiento?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  proxima_fecha_seguimiento?: Date;
 
-  @Column({ type: 'uuid', name: 'id_estado' })
-  idEstado: string;
+  @Column({ type: 'uuid' })
+  id_estado: string;
 
-  @Column({ type: 'uuid', name: 'id_fuente' })
-  idFuente: string;
+  @Column({ type: 'uuid' })
+  id_fuente: string;
 
-  @Column({ type: 'uuid', nullable: true, name: 'asignado_a_usuario' })
-  asignadoAUsuario?: string;
+  @Column({ type: 'uuid', nullable: true })
+  asignado_a_usuario?: string;
 
-  @ManyToOne(() => EstadoLead)
-  @JoinColumn({ name: 'id_estado' })
-  estado: EstadoLead;
+  @Column({ type: 'boolean', default: true })
+  esta_activo: boolean;
 
-  @ManyToOne(() => FuenteLead)
-  @JoinColumn({ name: 'id_fuente' })
-  fuente: FuenteLead;
+  @CreateDateColumn()
+  fecha_creacion: Date;
 }
