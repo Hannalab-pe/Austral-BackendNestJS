@@ -6,6 +6,14 @@ import { LeadsServiceModule } from './leads-service.module';
 async function bootstrap() {
   const app = await NestFactory.create(LeadsServiceModule);
 
+  // Configurar CORS
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+    credentials: true,
+  });
+
   // Habilitar validación global
   app.useGlobalPipes(
     new ValidationPipe({
