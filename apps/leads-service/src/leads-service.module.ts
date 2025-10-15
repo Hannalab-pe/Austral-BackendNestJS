@@ -29,7 +29,7 @@ import { DetalleSeguroAutoService } from './services/detalle-seguro-auto.service
         password: configService.get('DB_PASSWORD', 'postgres'),
         database: configService.get('DB_NAME', 'railway'),
         entities: [Lead, EstadoLead, FuenteLead, DetalleSeguroAuto],
-        synchronize: false,
+        synchronize: true, // Temporalmente true para crear tablas
       }),
     }),
     TypeOrmModule.forFeature([Lead, EstadoLead, FuenteLead, DetalleSeguroAuto]),
