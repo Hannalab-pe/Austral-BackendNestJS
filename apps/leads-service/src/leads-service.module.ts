@@ -4,7 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LeadsServiceController } from './leads-service.controller';
 import { LeadsServiceService } from './leads-service.service';
 import { Lead, EstadoLead, FuenteLead } from './entities';
-import { getDatabaseConfig } from 'y/common';
+import { LeadsController } from './controllers/leads.controller';
+import { EstadosLeadController } from './controllers/estados-lead.controller';
+import { FuentesLeadController } from './controllers/fuentes-lead.controller';
+import { LeadsService } from './services/leads.service';
+import { EstadosLeadService } from './services/estados-lead.service';
+import { FuentesLeadService } from './services/fuentes-lead.service';
 
 @Module({
   imports: [
@@ -13,13 +18,36 @@ import { getDatabaseConfig } from 'y/common';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        getDatabaseConfig(configService),
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST', 'localhost'),
+        port: configService.get('DB_PORT', 5432),
+        username: configService.get('DB_USERNAME', 'postgres'),
+        password: configService.get('DB_PASSWORD', 'postgres'),
+        database: configService.get('DB_NAME', 'railway'),
+        entities: [Lead, EstadoLead, FuenteLead],
+        synchronize: false,
+      }),
     }),
     TypeOrmModule.forFeature([Lead, EstadoLead, FuenteLead]),
   ],
-  controllers: [LeadsServiceController],
-  providers: [LeadsServiceService],
-  exports: [LeadsServiceService],
+  controllers: [
+    LeadsServiceController,
+    LeadsController,
+    EstadosLeadController,
+    FuentesLeadController,
+  ],
+  providers: [
+    LeadsServiceService,
+    LeadsService,
+    EstadosLeadService,
+    FuentesLeadService,
+  ],
+  exports: [
+    LeadsServiceService,
+    LeadsService,
+    EstadosLeadService,
+    FuentesLeadService,
+  ],
 })
 export class LeadsServiceModule {}
