@@ -24,7 +24,7 @@ export class AuthServiceService {
     private usuarioRepository: Repository<Usuario>,
     private rolesService: RolesService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const { usuario, contrasena } = loginDto;

@@ -6,6 +6,25 @@ import { AuthServiceModule } from './auth-service.module';
 async function bootstrap() {
   const app = await NestFactory.create(AuthServiceModule);
 
+  // Configuración CORS
+  app.enableCors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001', // Frontend Next.js
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+    ],
+  });
+
   // Validación global
   app.useGlobalPipes(
     new ValidationPipe({
@@ -30,5 +49,6 @@ async function bootstrap() {
 
   console.log(`🔐 Auth Service ejecutándose en puerto ${port}`);
   console.log(`📚 Swagger UI disponible en: http://localhost:${port}/api`);
+  console.log(`✅ CORS habilitado para: http://localhost:3000, http://localhost:3001`);
 }
 bootstrap();
