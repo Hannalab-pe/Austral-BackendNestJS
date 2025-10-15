@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsUUID, IsIn, Min, Max } from 'class-validator';
+import { IsString, IsInt, IsUUID, Min, Max } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateDetalleSeguroAutoDto {
@@ -20,7 +20,6 @@ export class CreateDetalleSeguroAutoDto {
   placa_auto: string;
 
   @IsString()
-  @IsIn(['particular', 'comercial', 'uber', 'taxi', 'delivery', 'otro'])
   tipo_uso: string;
 }
 
@@ -43,7 +42,7 @@ export class UpdateDetalleSeguroAutoDto {
   placa_auto?: string;
 
   @IsString()
-  @IsIn(['particular', 'comercial', 'uber', 'taxi', 'delivery', 'otro'])
+  @Transform(({ value }) => value?.trim())
   tipo_uso?: string;
 }
 

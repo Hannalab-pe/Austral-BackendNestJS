@@ -12,7 +12,6 @@ import { Lead } from './lead.entity';
 
 @Entity('detalle_seguro_auto')
 @Check(`"ano_auto" >= 1900 AND "ano_auto" <= EXTRACT(YEAR FROM CURRENT_DATE) + 1`)
-@Check(`"tipo_uso" IN ('particular', 'comercial', 'uber', 'taxi', 'delivery', 'otro')`)
 export class DetalleSeguroAuto {
   @PrimaryGeneratedColumn('uuid')
   id: string;

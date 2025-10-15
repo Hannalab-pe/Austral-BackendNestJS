@@ -45,6 +45,17 @@ export class DetalleSeguroAutoController {
           placa_auto: 'XYZ-789',
           tipo_uso: 'comercial'
         }
+      },
+      'ejemplo-libre': {
+        summary: 'Ejemplo con tipo de uso libre (cualquier valor)',
+        value: {
+          lead_id: '789e0123-e89b-12d3-a456-426614174002',
+          marca_auto: 'Ford',
+          ano_auto: 2021,
+          modelo_auto: 'Ranger',
+          placa_auto: 'DEF-456',
+          tipo_uso: 'Trabajo diario'
+        }
       }
     }
   })
@@ -100,7 +111,6 @@ export class DetalleSeguroAutoController {
       example: {
         statusCode: 400,
         message: [
-          'tipo_uso must be one of the following values: particular, comercial, uber, taxi, delivery, otro',
           'ano_auto must not be greater than 2026'
         ],
         error: 'Bad Request'
@@ -156,7 +166,7 @@ export class DetalleSeguroAutoController {
           ano_auto: 2019,
           modelo_auto: 'Civic',
           placa_auto: 'XYZ-789',
-          tipo_uso: 'comercial',
+          tipo_uso: 'Delivery de comida',
           fecha_creacion: '2025-10-14T15:30:00.000Z',
           fecha_actualizacion: '2025-10-14T15:30:00.000Z',
           lead: {
@@ -307,7 +317,7 @@ export class DetalleSeguroAutoController {
           ano_auto: 2021,
           modelo_auto: 'Focus',
           placa_auto: 'DEF-456',
-          tipo_uso: 'particular'
+          tipo_uso: 'Transporte de pasajeros'
         }
       }
     }
@@ -323,7 +333,7 @@ export class DetalleSeguroAutoController {
         ano_auto: 2020,
         modelo_auto: 'Civic',
         placa_auto: 'ABC-123',
-        tipo_uso: 'particular',
+        tipo_uso: 'Transporte de pasajeros',
         fecha_creacion: '2025-10-15T10:00:00.000Z',
         fecha_actualizacion: '2025-10-15T11:30:00.000Z',
         lead: {
@@ -353,7 +363,6 @@ export class DetalleSeguroAutoController {
       example: {
         statusCode: 400,
         message: [
-          'tipo_uso must be one of the following values: particular, comercial, uber, taxi, delivery, otro',
           'ano_auto must not be greater than 2026'
         ],
         error: 'Bad Request'
