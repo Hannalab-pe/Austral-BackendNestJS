@@ -1,3 +1,3 @@
-export { ProductosController } from './productos.controller';
-export { CategoriasProductoController } from './categorias-producto.controller';
-export { CompaniasController } from './companias.controller';
+export { TiposSegurosController } from './tipos-seguros.controller';
+export { CompaniasSeguroController } from './companias-seguro.controller';
+export { ProductosSeguroController } from './productos-seguro.controller';

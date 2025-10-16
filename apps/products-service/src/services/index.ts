@@ -1,3 +1,3 @@
-export { ProductosService } from './productos.service';
-export { CategoriasProductoService } from './categorias-producto.service';
-export { CompaniasService } from './companias.service';
+export { TiposSegurosService } from './tipos-seguros.service';
+export { CompaniasSeguroService } from './companias-seguro.service';
+export { ProductosSeguroService } from './productos-seguro.service';

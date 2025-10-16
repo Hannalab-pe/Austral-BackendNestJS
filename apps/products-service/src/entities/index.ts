@@ -1,3 +1,3 @@
-export { Producto } from './producto.entity';
-export { CategoriaProducto } from './categoria-producto.entity';
-export { Compania } from './compania.entity';
+export { TipoSeguro } from './tipo-seguro.entity';
+export { CompaniaSeguro } from './compania-seguro.entity';
+export { ProductoSeguro } from './producto-seguro.entity';

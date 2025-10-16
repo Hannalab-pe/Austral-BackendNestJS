@@ -1,25 +1,54 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
-  ProductosController,
-  CategoriasProductoController,
-  CompaniasController,
+  TiposSegurosController,
+  CompaniasSeguroController,
+  ProductosSeguroController,
 } from './controllers';
 import {
-  ProductosService,
-  CategoriasProductoService,
-  CompaniasService,
+  TiposSegurosService,
+  CompaniasSeguroService,
+  ProductosSeguroService,
 } from './services';
-import { Producto, CategoriaProducto, Compania } from './entities';
+import { TipoSeguro, CompaniaSeguro, ProductoSeguro } from './entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Producto, CategoriaProducto, Compania])],
-  controllers: [
-    ProductosController,
-    CategoriasProductoController,
-    CompaniasController,
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST', 'localhost'),
+        port: configService.get('DB_PORT', 5432),
+        username: configService.get('DB_USERNAME', 'postgres'),
+        password: configService.get('DB_PASSWORD', ''),
+        database: configService.get('DB_NAME', 'austral_seguros'),
+        entities: [TipoSeguro, CompaniaSeguro, ProductoSeguro],
+        synchronize: false, // NO modificar la BD existente
+        logging: configService.get('NODE_ENV') === 'development',
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forFeature([TipoSeguro, CompaniaSeguro, ProductoSeguro]),
   ],
-  providers: [ProductosService, CategoriasProductoService, CompaniasService],
-  exports: [ProductosService, CategoriasProductoService, CompaniasService],
+  controllers: [
+    TiposSegurosController,
+    CompaniasSeguroController,
+    ProductosSeguroController,
+  ],
+  providers: [
+    TiposSegurosService,
+    CompaniasSeguroService,
+    ProductosSeguroService,
+  ],
+  exports: [
+    TiposSegurosService,
+    CompaniasSeguroService,
+    ProductosSeguroService,
+  ],
 })
 export class ProductsServiceModule {}
