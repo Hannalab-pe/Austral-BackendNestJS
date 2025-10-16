@@ -81,4 +81,7 @@ export class Lead {
   @ManyToOne(() => FuenteLead)
   @JoinColumn({ name: 'id_fuente' })
   fuente: FuenteLead;
+
+  // Relación con DetalleSeguroAuto (OneToMany)
+  detalles_seguro_auto?: any[];
 }

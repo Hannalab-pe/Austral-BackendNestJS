@@ -31,6 +31,7 @@ async function bootstrap() {
     .addTag('Leads')
     .addTag('Estados de Lead')
     .addTag('Fuentes de Lead')
+    .addTag('Detalle Seguro Auto')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
