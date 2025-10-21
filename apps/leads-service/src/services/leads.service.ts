@@ -55,4 +55,63 @@ export class LeadsService {
       order: { fecha_creacion: 'DESC' },
     });
   }
+
+  async update(id: string, updateData: Partial<Lead>): Promise<Lead> {
+    const lead = await this.leadRepository.findOne({
+      where: { id_lead: id, esta_activo: true },
+    });
+
+    if (!lead) {
+      throw new BadRequestException('Lead no encontrado');
+    }
+
+    // Si se está actualizando el estado, verificar que existe
+    if (updateData.id_estado) {
+      const estado = await this.estadoLeadRepository.findOne({
+        where: { id_estado: updateData.id_estado, esta_activo: true },
+      });
+
+      if (!estado) {
+        throw new BadRequestException('Estado de lead no válido o inactivo');
+      }
+    }
+
+    // Si se está actualizando la fuente, verificar que existe
+    if (updateData.id_fuente) {
+      const fuente = await this.fuenteLeadRepository.findOne({
+        where: { id_fuente: updateData.id_fuente, esta_activo: true },
+      });
+
+      if (!fuente) {
+        throw new BadRequestException('Fuente de lead no válida o inactiva');
+      }
+    }
+
+    // Actualizar los campos
+    Object.assign(lead, updateData);
+
+    return await this.leadRepository.save(lead);
+  }
+
+  async updateStatus(id: string, idEstado: string): Promise<Lead> {
+    const lead = await this.leadRepository.findOne({
+      where: { id_lead: id, esta_activo: true },
+    });
+
+    if (!lead) {
+      throw new BadRequestException('Lead no encontrado');
+    }
+
+    // Verificar que el estado existe
+    const estado = await this.estadoLeadRepository.findOne({
+      where: { id_estado: idEstado, esta_activo: true },
+    });
+
+    if (!estado) {
+      throw new BadRequestException('Estado de lead no válido o inactivo');
+    }
+
+    lead.id_estado = idEstado;
+    return await this.leadRepository.save(lead);
+  }
 }
