@@ -49,6 +49,8 @@ async function bootstrap() {
 
   console.log(`🔐 Auth Service ejecutándose en puerto ${port}`);
   console.log(`📚 Swagger UI disponible en: http://localhost:${port}/api`);
-  console.log(`✅ CORS habilitado para: http://localhost:3000, http://localhost:3001`);
+  console.log(
+    `✅ CORS habilitado para: http://localhost:3000, http://localhost:3001`,
+  );
 }
 bootstrap();
