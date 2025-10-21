@@ -9,8 +9,7 @@ import { RolesController } from './controllers/roles.controller';
 import { UsuariosController } from './controllers/usuarios.controller';
 import { RolesService } from './services/roles.service';
 import { UsuariosService } from './services/usuarios.service';
-import { Usuario } from './entities/usuario.entity';
-import { Rol } from './entities/rol.entity';
+import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista } from './entities';
 import { JwtStrategy } from './strategies';
 
 @Module({
@@ -27,13 +26,13 @@ import { JwtStrategy } from './strategies';
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'austral_seguros'),
-        entities: [Usuario, Rol],
+        entities: [Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista],
         synchronize: false, // NO modificar la BD existente
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Usuario, Rol]),
+    TypeOrmModule.forFeature([Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],
