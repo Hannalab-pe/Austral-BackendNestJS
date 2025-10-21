@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { LeadsService } from '../services/leads.service';
 import { CreateLeadDto } from '../dto/leads.dto';
@@ -94,5 +94,41 @@ export class LeadsController {
   })
   async findAll() {
     return this.leadsService.findAll();
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar un lead existente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lead actualizado exitosamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Lead no encontrado',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos',
+  })
+  async update(@Param('id') id: string, @Body() updateData: any) {
+    return this.leadsService.update(id, updateData);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Actualizar el estado de un lead' })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado del lead actualizado exitosamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Lead no encontrado',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Estado inválido',
+  })
+  async updateStatus(@Param('id') id: string, @Body() body: { id_estado: string }) {
+    return this.leadsService.updateStatus(id, body.id_estado);
   }
 }
