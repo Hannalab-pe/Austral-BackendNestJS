@@ -1,5 +1,5 @@
--- Crear tabla detalle_seguro_scrt con ID UUID auto-generado
-CREATE TABLE IF NOT EXISTS detalle_seguro_scrt (
+-- Crear tabla detalle_seguro_sctr con ID UUID auto-generado
+CREATE TABLE IF NOT EXISTS detalle_seguro_sctr (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lead_id UUID NOT NULL,
     razon_social VARCHAR(255) NOT NULL,
@@ -12,17 +12,17 @@ CREATE TABLE IF NOT EXISTS detalle_seguro_scrt (
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     -- Foreign key constraint
-    CONSTRAINT fk_detalle_seguro_scrt_lead
+    CONSTRAINT fk_detalle_seguro_sctr_lead
     FOREIGN KEY (lead_id) REFERENCES lead(id_lead) ON DELETE CASCADE
 );
 
 -- Crear índices para mejor rendimiento
-CREATE INDEX IF NOT EXISTS idx_detalle_seguro_scrt_lead_id ON detalle_seguro_scrt(lead_id);
-CREATE INDEX IF NOT EXISTS idx_detalle_seguro_scrt_fecha_creacion ON detalle_seguro_scrt(fecha_creacion);
-CREATE INDEX IF NOT EXISTS idx_detalle_seguro_scrt_ruc ON detalle_seguro_scrt(ruc);
+CREATE INDEX IF NOT EXISTS idx_detalle_seguro_sctr_lead_id ON detalle_seguro_sctr(lead_id);
+CREATE INDEX IF NOT EXISTS idx_detalle_seguro_sctr_fecha_creacion ON detalle_seguro_sctr(fecha_creacion);
+CREATE INDEX IF NOT EXISTS idx_detalle_seguro_sctr_ruc ON detalle_seguro_sctr(ruc);
 
 -- Crear trigger para actualizar fecha_actualizacion automáticamente
-CREATE OR REPLACE FUNCTION update_fecha_actualizacion_scrt()
+CREATE OR REPLACE FUNCTION update_fecha_actualizacion_sctr()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.fecha_actualizacion = CURRENT_TIMESTAMP;
@@ -30,13 +30,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_detalle_seguro_scrt
-    BEFORE UPDATE ON detalle_seguro_scrt
+CREATE TRIGGER trigger_update_detalle_seguro_sctr
+    BEFORE UPDATE ON detalle_seguro_sctr
     FOR EACH ROW
-    EXECUTE FUNCTION update_fecha_actualizacion_scrt();
+    EXECUTE FUNCTION update_fecha_actualizacion_sctr();
 
 -- Verificar que la tabla se creó correctamente
 SELECT column_name, data_type, is_nullable, column_default
 FROM information_schema.columns
-WHERE table_name = 'detalle_seguro_scrt'
+WHERE table_name = 'detalle_seguro_sctr'
 ORDER BY ordinal_position;

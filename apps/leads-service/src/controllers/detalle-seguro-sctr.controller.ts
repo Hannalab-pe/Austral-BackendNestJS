@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { DetalleSeguroScrtService } from '../services/detalle-seguro-scrt.service';
-import { CreateDetalleSeguroScrtDto } from '../dto/detalle-seguro-scrt.dto';
+import { DetalleSeguroSctrService } from '../services/detalle-seguro-sctr.service';
+import { CreateDetalleSeguroSctrDto } from '../dto/detalle-seguro-sctr.dto';
 
 @ApiTags('Detalle Seguro SCTR')
-@Controller('detalle-seguro-scrt')
-export class DetalleSeguroScrtController {
-  constructor(private readonly detalleSeguroScrtService: DetalleSeguroScrtService) {}
+@Controller('detalle-seguro-sctr')
+export class DetalleSeguroSctrController {
+  constructor(private readonly detalleSeguroSctrService: DetalleSeguroSctrService) {}
 
   @Post()
   @ApiOperation({ summary: 'Crear detalle de seguro SCTR para un lead' })
@@ -38,8 +38,8 @@ export class DetalleSeguroScrtController {
     status: 400,
     description: 'Datos inválidos, lead no válido o ya existe detalle',
   })
-  async create(@Body() createDto: CreateDetalleSeguroScrtDto) {
-    return this.detalleSeguroScrtService.create(createDto);
+  async create(@Body() createDto: CreateDetalleSeguroSctrDto) {
+    return this.detalleSeguroSctrService.create(createDto);
   }
 
   @Get()
@@ -49,7 +49,7 @@ export class DetalleSeguroScrtController {
     description: 'Lista de detalles obtenida exitosamente',
   })
   async findAll() {
-    return this.detalleSeguroScrtService.findAll();
+    return this.detalleSeguroSctrService.findAll();
   }
 
   @Get(':leadId')
@@ -64,6 +64,6 @@ export class DetalleSeguroScrtController {
     description: 'Detalle no encontrado',
   })
   async findByLeadId(@Param('leadId') leadId: string) {
-    return this.detalleSeguroScrtService.findByLeadId(leadId);
+    return this.detalleSeguroSctrService.findByLeadId(leadId);
   }
 }

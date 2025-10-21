@@ -2,4 +2,4 @@ export * from './leads.controller';
 export * from './estados-lead.controller';
 export * from './fuentes-lead.controller';
 export * from './detalle-seguro-salud.controller';
-export * from './detalle-seguro-scrt.controller';
+export * from './detalle-seguro-sctr.controller';

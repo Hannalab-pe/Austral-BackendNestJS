@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 import { Lead } from './lead.entity';
 
-@Entity('detalle_seguro_scrt')
-export class DetalleSeguroScrt {
+@Entity('detalle_seguro_sctr')
+export class DetalleSeguroSctr {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

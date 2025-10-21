@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateDetalleSeguroScrtDto {
+export class CreateDetalleSeguroSctrDto {
   @ApiProperty({ description: 'ID del lead', example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsNotEmpty()
   @IsUUID()
@@ -46,7 +46,7 @@ export class CreateDetalleSeguroScrtDto {
   tipo_seguro: string;
 }
 
-export class UpdateDetalleSeguroScrtDto {
+export class UpdateDetalleSeguroSctrDto {
   @ApiProperty({
     description: 'Razón social de la empresa',
     example: 'Empresa XYZ S.A.',

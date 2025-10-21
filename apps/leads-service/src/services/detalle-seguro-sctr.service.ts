@@ -1,20 +1,20 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DetalleSeguroScrt } from '../entities/detalle-seguro-scrt.entity';
+import { DetalleSeguroSctr } from '../entities/detalle-seguro-sctr.entity';
 import { Lead } from '../entities/lead.entity';
-import { CreateDetalleSeguroScrtDto } from '../dto/detalle-seguro-scrt.dto';
+import { CreateDetalleSeguroSctrDto } from '../dto/detalle-seguro-sctr.dto';
 
 @Injectable()
-export class DetalleSeguroScrtService {
+export class DetalleSeguroSctrService {
   constructor(
-    @InjectRepository(DetalleSeguroScrt)
-    private detalleSeguroScrtRepository: Repository<DetalleSeguroScrt>,
+    @InjectRepository(DetalleSeguroSctr)
+    private detalleSeguroSctrRepository: Repository<DetalleSeguroSctr>,
     @InjectRepository(Lead)
     private leadRepository: Repository<Lead>,
   ) {}
 
-  async create(createDto: CreateDetalleSeguroScrtDto): Promise<DetalleSeguroScrt> {
+  async create(createDto: CreateDetalleSeguroSctrDto): Promise<DetalleSeguroSctr> {
     // Verificar que el lead existe y está activo
     const lead = await this.leadRepository.findOne({
       where: { id_lead: createDto.lead_id, esta_activo: true },
@@ -25,7 +25,7 @@ export class DetalleSeguroScrtService {
     }
 
     // Verificar que no existe ya un detalle para este lead
-    const existingDetalle = await this.detalleSeguroScrtRepository.findOne({
+    const existingDetalle = await this.detalleSeguroSctrRepository.findOne({
       where: { lead_id: createDto.lead_id },
     });
 
@@ -34,19 +34,19 @@ export class DetalleSeguroScrtService {
     }
 
     // Crear el detalle
-    const detalle = this.detalleSeguroScrtRepository.create(createDto);
-    return await this.detalleSeguroScrtRepository.save(detalle);
+    const detalle = this.detalleSeguroSctrRepository.create(createDto);
+    return await this.detalleSeguroSctrRepository.save(detalle);
   }
 
-  async findAll(): Promise<DetalleSeguroScrt[]> {
-    return await this.detalleSeguroScrtRepository.find({
+  async findAll(): Promise<DetalleSeguroSctr[]> {
+    return await this.detalleSeguroSctrRepository.find({
       relations: ['lead'],
       order: { fecha_creacion: 'DESC' },
     });
   }
 
-  async findByLeadId(leadId: string): Promise<DetalleSeguroScrt | null> {
-    return await this.detalleSeguroScrtRepository.findOne({
+  async findByLeadId(leadId: string): Promise<DetalleSeguroSctr | null> {
+    return await this.detalleSeguroSctrRepository.findOne({
       where: { lead_id: leadId },
       relations: ['lead'],
     });
