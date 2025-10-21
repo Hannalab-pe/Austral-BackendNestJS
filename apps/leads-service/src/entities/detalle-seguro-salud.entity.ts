@@ -35,8 +35,8 @@ export class DetalleSeguroSalud {
   @Column({ type: 'varchar', length: 100 })
   preferencia_plan: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  reembolso: number;
+  @Column({ type: 'varchar', length: 255, default: '' })
+  reembolso: string;
 
   @Column({ type: 'text' })
   coberturas: string;
