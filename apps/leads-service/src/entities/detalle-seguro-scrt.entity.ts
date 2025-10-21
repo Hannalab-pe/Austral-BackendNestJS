@@ -9,37 +9,31 @@ import {
 } from 'typeorm';
 import { Lead } from './lead.entity';
 
-@Entity('detalle_seguro_salud')
-export class DetalleSeguroSalud {
+@Entity('detalle_seguro_scrt')
+export class DetalleSeguroScrt {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'uuid' })
   lead_id: string;
 
-  @Column({ type: 'int' })
-  edad: number;
+  @Column({ type: 'varchar', length: 255 })
+  razon_social: string;
 
   @Column({ type: 'varchar', length: 20 })
-  sexo: string;
+  ruc: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  grupo_familiar: string;
+  @Column({ type: 'int' })
+  numero_trabajadores: number;
 
-  @Column({ type: 'text' })
-  estado_clinico: string;
+  @Column({ type: 'decimal', precision: 15, scale: 2 })
+  monto_planilla: number;
 
   @Column({ type: 'varchar', length: 255 })
-  zona_trabajo_vivienda: string;
+  actividad_negocio: string;
 
   @Column({ type: 'varchar', length: 100 })
-  preferencia_plan: string;
-
-  @Column({ type: 'varchar', length: 255, default: '' })
-  reembolso: string;
-
-  @Column({ type: 'text' })
-  coberturas: string;
+  tipo_seguro: string;
 
   @CreateDateColumn()
   fecha_creacion: Date;

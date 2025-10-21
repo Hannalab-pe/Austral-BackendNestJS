@@ -66,12 +66,11 @@ export class CreateDetalleSeguroSaludDto {
 
   @ApiProperty({
     description: 'Reembolso esperado',
-    example: 1500.50,
+    example: '1500.50',
     required: false,
   })
-  @IsNumber()
-  @Min(0)
-  reembolso?: number;
+  @IsString()
+  reembolso?: string;
 
   @ApiProperty({
     description: 'Coberturas deseadas',
@@ -137,12 +136,11 @@ export class UpdateDetalleSeguroSaludDto {
 
   @ApiProperty({
     description: 'Reembolso esperado',
-    example: 1500.50,
+    example: '1500.50',
     required: false,
   })
-  @IsNumber()
-  @Min(0)
-  reembolso?: number;
+  @IsString()
+  reembolso?: string;
 
   @ApiProperty({
     description: 'Coberturas deseadas',
