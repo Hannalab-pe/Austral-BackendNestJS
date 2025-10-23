@@ -14,9 +14,13 @@ export class CalcularCotizacionDto {
   @ApiProperty({
     description: 'Datos específicos del seguro',
     example: {
-      edad: 35,
-      sexo: 'Masculino',
-      grupo_familiar: 'Pareja e hijos (2)'
+      marca: 'Toyota',
+      modelo: 'Corolla',
+      anio: 2020,
+      valor_vehiculo: 15000,
+      tipo_cobertura: 'Todo riesgo',
+      zona_riesgo: 'Media',
+      antiguedad_licencia: 5
     }
   })
   @IsObject()
