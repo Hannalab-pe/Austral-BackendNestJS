@@ -21,6 +21,7 @@ export class CotizacionesService {
     { marca: 'Toyota', modelo: 'Yaris', anio: 2021, precio_base: 13500, tasa_base: 3.8 },
     { marca: 'Toyota', modelo: 'RAV4', anio: 2020, precio_base: 22000, tasa_base: 3.2 },
     { marca: 'Toyota', modelo: 'RAV4', anio: 2021, precio_base: 24000, tasa_base: 3.0 },
+    { marca: 'Toyota', modelo: 'Sportage', anio: 2020, precio_base: 19000, tasa_base: 3.6 },
 
     // Hyundai
     { marca: 'Hyundai', modelo: 'Tucson', anio: 2020, precio_base: 18000, tasa_base: 3.8 },
