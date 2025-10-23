@@ -10,7 +10,10 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDetalleSeguroSaludDto {
-  @ApiProperty({ description: 'ID del lead', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiProperty({
+    description: 'ID del lead',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @IsNotEmpty()
   @IsUUID()
   lead_id: string;

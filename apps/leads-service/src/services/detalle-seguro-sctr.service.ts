@@ -14,7 +14,9 @@ export class DetalleSeguroSctrService {
     private leadRepository: Repository<Lead>,
   ) {}
 
-  async create(createDto: CreateDetalleSeguroSctrDto): Promise<DetalleSeguroSctr> {
+  async create(
+    createDto: CreateDetalleSeguroSctrDto,
+  ): Promise<DetalleSeguroSctr> {
     // Verificar que el lead existe y está activo
     const lead = await this.leadRepository.findOne({
       where: { id_lead: createDto.lead_id, esta_activo: true },
@@ -30,7 +32,9 @@ export class DetalleSeguroSctrService {
     });
 
     if (existingDetalle) {
-      throw new BadRequestException('Ya existe un detalle de seguro SCTR para este lead');
+      throw new BadRequestException(
+        'Ya existe un detalle de seguro SCTR para este lead',
+      );
     }
 
     // Crear el detalle

@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { DetalleSeguroSaludService } from '../services/detalle-seguro-salud.service';
 import { CreateDetalleSeguroSaludDto } from '../dto/detalle-seguro-salud.dto';
@@ -6,7 +13,9 @@ import { CreateDetalleSeguroSaludDto } from '../dto/detalle-seguro-salud.dto';
 @ApiTags('Detalle Seguro Salud')
 @Controller('detalle-seguro-salud')
 export class DetalleSeguroSaludController {
-  constructor(private readonly detalleSeguroSaludService: DetalleSeguroSaludService) {}
+  constructor(
+    private readonly detalleSeguroSaludService: DetalleSeguroSaludService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Crear detalle de seguro salud para un lead' })
@@ -68,7 +77,9 @@ export class DetalleSeguroSaludController {
   async findByLeadId(@Param('leadId') leadId: string) {
     const detalle = await this.detalleSeguroSaludService.findByLeadId(leadId);
     if (!detalle) {
-      throw new NotFoundException('Detalle de seguro salud no encontrado para este lead');
+      throw new NotFoundException(
+        'Detalle de seguro salud no encontrado para este lead',
+      );
     }
     return detalle;
   }
