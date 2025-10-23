@@ -7,19 +7,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Actividad } from '../entities/actividad.entity';
 import { CreateActividadDto, UpdateActividadDto } from '../dto';
+import { AuditoriaService } from './auditoria.service';
 
 @Injectable()
 export class ActividadesService {
   constructor(
     @InjectRepository(Actividad)
     private readonly actividadRepository: Repository<Actividad>,
-  ) {}
+    private readonly auditoriaService: AuditoriaService,
+  ) { }
 
   async findAll(page: number = 1, limit: number = 10) {
     const [data, total] = await this.actividadRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { id: 'DESC' },
+      order: { fechaCreacion: 'DESC' },
     });
 
     return {
@@ -31,9 +33,9 @@ export class ActividadesService {
     };
   }
 
-  async findOne(id: number): Promise<Actividad> {
+  async findOne(id: string): Promise<Actividad> {
     const actividad = await this.actividadRepository.findOne({
-      where: { id },
+      where: { idActividad: id },
     });
 
     if (!actividad) {
@@ -43,64 +45,98 @@ export class ActividadesService {
     return actividad;
   }
 
-  async create(createActividadDto: CreateActividadDto): Promise<Actividad> {
+  async create(createActividadDto: CreateActividadDto, userId: string): Promise<Actividad> {
     try {
       const actividad = this.actividadRepository.create(createActividadDto);
-      return await this.actividadRepository.save(actividad);
+      const savedActividad = await this.actividadRepository.save(actividad);
+
+      // Registrar en auditoría
+      await this.auditoriaService.createAuditoriaRecord({
+        tabla: 'actividad',
+        idRegistro: savedActividad.idActividad,
+        accion: 'INSERT',
+        idUsuario: userId,
+      });
+
+      return savedActividad;
     } catch (error) {
       throw new BadRequestException('Error al crear la actividad');
     }
   }
 
   async update(
-    id: number,
+    id: string,
     updateActividadDto: UpdateActividadDto,
+    userId: string,
   ): Promise<Actividad> {
     const actividad = await this.findOne(id);
 
     Object.assign(actividad, updateActividadDto);
-    return await this.actividadRepository.save(actividad);
+    const savedActividad = await this.actividadRepository.save(actividad);
+
+    // Registrar en auditoría
+    await this.auditoriaService.createAuditoriaRecord({
+      tabla: 'actividad',
+      idRegistro: id,
+      accion: 'UPDATE',
+      idUsuario: userId,
+    });
+
+    return savedActividad;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const actividad = await this.findOne(id);
     await this.actividadRepository.remove(actividad);
   }
 
-  async findByUsuario(usuarioId: number): Promise<Actividad[]> {
+  async findByUsuario(usuarioId: string): Promise<Actividad[]> {
     return await this.actividadRepository.find({
-      where: { usuarioId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { realizadaPorUsuario: usuarioId },
+      order: { fechaActividad: 'ASC' },
     });
   }
 
-  async findByCliente(clienteId: number): Promise<Actividad[]> {
+  async findByCliente(clienteId: string): Promise<Actividad[]> {
     return await this.actividadRepository.find({
-      where: { clienteId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { idCliente: clienteId },
+      order: { fechaActividad: 'ASC' },
     });
   }
 
-  async findByLead(leadId: number): Promise<Actividad[]> {
+  async findByLead(leadId: string): Promise<Actividad[]> {
     return await this.actividadRepository.find({
-      where: { leadId },
-      order: { fechaVencimiento: 'ASC' },
+      where: { idLead: leadId },
+      order: { fechaActividad: 'ASC' },
     });
   }
 
-  async findPendingActivities(): Promise<Actividad[]> {
+  async findUpcomingActivities(): Promise<Actividad[]> {
     return await this.actividadRepository.find({
-      where: { completada: false },
-      order: { fechaVencimiento: 'ASC' },
+      where: {
+        fechaActividad: {
+          $gte: new Date()
+        } as any
+      },
+      order: { fechaActividad: 'ASC' },
     });
   }
 
-  async findOverdueActivities(): Promise<Actividad[]> {
+  async findByTipo(tipo: string): Promise<Actividad[]> {
+    return await this.actividadRepository.find({
+      where: { tipoActividad: tipo },
+      order: { fechaActividad: 'ASC' },
+    });
+  }
+
+  async findByFechaRange(fechaInicio: Date, fechaFin: Date): Promise<Actividad[]> {
     return await this.actividadRepository
       .createQueryBuilder('actividad')
-      .where('actividad.fechaVencimiento < :today', { today: new Date() })
-      .andWhere('actividad.completada = :completada', { completada: false })
-      .orderBy('actividad.fechaVencimiento', 'ASC')
+      .where('actividad.fechaActividad BETWEEN :fechaInicio AND :fechaFin', {
+        fechaInicio,
+        fechaFin,
+      })
+      .orderBy('actividad.fechaActividad', 'ASC')
       .getMany();
   }
 }

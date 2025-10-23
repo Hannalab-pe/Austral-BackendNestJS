@@ -92,15 +92,28 @@ export class AuditoriaService {
         idUsuario?: string;
         ipAddress?: string;
     }): Promise<Auditoria> {
-        const auditoria = this.auditoriaRepository.create({
-            tabla: auditoriaData.tabla,
-            idRegistro: auditoriaData.idRegistro,
-            accion: auditoriaData.accion,
-            idUsuario: auditoriaData.idUsuario,
-            ipAddress: auditoriaData.ipAddress,
-        });
+        try {
+            console.log('🔍 Creando registro de auditoría:', auditoriaData);
 
-        return await this.auditoriaRepository.save(auditoria);
+            const auditoria = this.auditoriaRepository.create({
+                tabla: auditoriaData.tabla,
+                idRegistro: auditoriaData.idRegistro,
+                accion: auditoriaData.accion,
+                idUsuario: auditoriaData.idUsuario,
+                ipAddress: auditoriaData.ipAddress,
+            });
+
+            console.log('📝 Registro de auditoría creado en memoria:', auditoria);
+
+            const savedAuditoria = await this.auditoriaRepository.save(auditoria);
+
+            console.log('💾 Registro de auditoría guardado en BD:', savedAuditoria);
+
+            return savedAuditoria;
+        } catch (error) {
+            console.error('❌ Error al crear registro de auditoría:', error);
+            throw error;
+        }
     }
 
     /**

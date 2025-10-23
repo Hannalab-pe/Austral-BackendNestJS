@@ -1,6 +1,8 @@
 import {
     Controller,
     Get,
+    Post,
+    Body,
     Query,
     Param,
     UseGuards,
@@ -16,14 +18,22 @@ import { AuditoriaService, AuditoriaFiltros } from '../services/auditoria.servic
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { Auditoria } from '../entities/auditoria.entity';
 
+interface CreateAuditoriaDto {
+    tabla: string;
+    idRegistro: string;
+    accion: string;
+    idUsuario?: string;
+    ipAddress?: string;
+}
+
 @ApiTags('auditoria')
 @Controller('auditoria')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class AuditoriaController {
     constructor(private readonly auditoriaService: AuditoriaService) { }
 
     @Get()
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Obtener todos los registros de auditoría',
         description: 'Lista todos los registros de auditoría con filtros opcionales',
@@ -65,6 +75,8 @@ export class AuditoriaController {
     }
 
     @Get('usuario/:idUsuario')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Obtener registros de auditoría por usuario',
         description: 'Lista todos los registros de auditoría de un usuario específico con filtros opcionales',
@@ -107,6 +119,8 @@ export class AuditoriaController {
     }
 
     @Get('stats')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Obtener estadísticas de auditoría',
         description: 'Retorna estadísticas generales de los registros de auditoría',
@@ -117,5 +131,19 @@ export class AuditoriaController {
     })
     async getStats() {
         return this.auditoriaService.getStats();
+    }
+
+    @Post()
+    @ApiOperation({
+        summary: 'Crear un registro de auditoría',
+        description: 'Crea un nuevo registro en la tabla de auditoría (para uso interno de microservicios)',
+    })
+    @ApiResponse({
+        status: 201,
+        description: 'Registro de auditoría creado exitosamente',
+        type: Auditoria,
+    })
+    async create(@Body() createAuditoriaDto: CreateAuditoriaDto): Promise<Auditoria> {
+        return this.auditoriaService.create(createAuditoriaDto);
     }
 }

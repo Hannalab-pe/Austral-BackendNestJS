@@ -3,50 +3,53 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
-@Entity('actividades')
+@Entity('actividad')
 export class Actividad {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_actividad' })
+  idActividad: string;
 
-  @Column()
+  @Column({ length: 50, name: 'tipo_actividad' })
+  @Index()
+  tipoActividad: string;
+
+  @Column({ length: 200, name: 'titulo' })
   titulo: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, name: 'descripcion' })
   descripcion?: string;
 
-  @Column()
-  tipo: string;
+  @Column({ type: 'timestamp', name: 'fecha_actividad' })
+  @Index()
+  fechaActividad: Date;
 
-  @Column()
-  usuarioId: number;
+  @Column({ type: 'int', nullable: true, name: 'duracion_minutos' })
+  duracionMinutos?: number;
 
-  @Column({ nullable: true })
-  clienteId?: number;
+  @Column({ length: 100, nullable: true, name: 'resultado' })
+  resultado?: string;
 
-  @Column({ nullable: true })
-  leadId?: number;
+  @Column('text', { nullable: true, name: 'proxima_accion' })
+  proximaAccion?: string;
 
-  @Column({ type: 'datetime' })
-  fechaVencimiento: Date;
+  @Column({ type: 'timestamp', nullable: true, name: 'fecha_proxima_accion' })
+  fechaProximaAccion?: Date;
 
-  @Column({ default: false })
-  completada: boolean;
+  @Column('uuid', { nullable: true, name: 'id_lead' })
+  idLead?: string;
 
-  @Column({ nullable: true })
-  fechaCompletada?: Date;
+  @Column('uuid', { nullable: true, name: 'id_cliente' })
+  idCliente?: string;
 
-  @Column({ nullable: true })
-  prioridad?: string; // 'alta', 'media', 'baja'
+  @Column('uuid', { nullable: true, name: 'id_poliza' })
+  idPoliza?: string;
 
-  @Column('text', { nullable: true })
-  notas?: string;
+  @Column('uuid', { name: 'realizada_por_usuario' })
+  @Index()
+  realizadaPorUsuario: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;
-
-  @UpdateDateColumn()
-  fechaActualizacion: Date;
 }
