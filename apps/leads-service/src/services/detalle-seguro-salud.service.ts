@@ -14,7 +14,9 @@ export class DetalleSeguroSaludService {
     private leadRepository: Repository<Lead>,
   ) {}
 
-  async create(createDto: CreateDetalleSeguroSaludDto): Promise<DetalleSeguroSalud> {
+  async create(
+    createDto: CreateDetalleSeguroSaludDto,
+  ): Promise<DetalleSeguroSalud> {
     // Verificar que el lead existe y está activo
     const lead = await this.leadRepository.findOne({
       where: { id_lead: createDto.lead_id, esta_activo: true },
@@ -30,7 +32,9 @@ export class DetalleSeguroSaludService {
     });
 
     if (existingDetalle) {
-      throw new BadRequestException('Ya existe un detalle de seguro salud para este lead');
+      throw new BadRequestException(
+        'Ya existe un detalle de seguro salud para este lead',
+      );
     }
 
     // Crear el detalle

@@ -6,7 +6,9 @@ import { CreateDetalleSeguroSctrDto } from '../dto/detalle-seguro-sctr.dto';
 @ApiTags('Detalle Seguro SCTR')
 @Controller('detalle-seguro-sctr')
 export class DetalleSeguroSctrController {
-  constructor(private readonly detalleSeguroSctrService: DetalleSeguroSctrService) {}
+  constructor(
+    private readonly detalleSeguroSctrService: DetalleSeguroSctrService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Crear detalle de seguro SCTR para un lead' })

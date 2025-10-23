@@ -13,12 +13,14 @@ import { FuentesLeadController } from './controllers/fuentes-lead.controller';
 import { DetalleSeguroAutoController } from './controllers/detalle-seguro-auto.controller';
 import { DetalleSeguroSaludController } from './controllers/detalle-seguro-salud.controller';
 import { DetalleSeguroSctrController } from './controllers/detalle-seguro-sctr.controller';
+import { CotizacionesController } from './controllers/cotizaciones.controller';
 import { LeadsService } from './services/leads.service';
 import { EstadosLeadService } from './services/estados-lead.service';
 import { FuentesLeadService } from './services/fuentes-lead.service';
 import { DetalleSeguroAutoService } from './services/detalle-seguro-auto.service';
 import { DetalleSeguroSaludService } from './services/detalle-seguro-salud.service';
 import { DetalleSeguroSctrService } from './services/detalle-seguro-sctr.service';
+import { CotizacionesService } from './services/cotizaciones.service';
 
 @Module({
   imports: [
@@ -34,11 +36,25 @@ import { DetalleSeguroSctrService } from './services/detalle-seguro-sctr.service
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', 'postgres'),
         database: configService.get('DB_NAME', 'railway'),
-        entities: [Lead, EstadoLead, FuenteLead, DetalleSeguroAuto, DetalleSeguroSalud, DetalleSeguroSctr],
+        entities: [
+          Lead,
+          EstadoLead,
+          FuenteLead,
+          DetalleSeguroAuto,
+          DetalleSeguroSalud,
+          DetalleSeguroSctr,
+        ],
         synchronize: true, // Temporalmente true para crear tablas
       }),
     }),
-    TypeOrmModule.forFeature([Lead, EstadoLead, FuenteLead, DetalleSeguroAuto, DetalleSeguroSalud, DetalleSeguroSctr]),
+    TypeOrmModule.forFeature([
+      Lead,
+      EstadoLead,
+      FuenteLead,
+      DetalleSeguroAuto,
+      DetalleSeguroSalud,
+      DetalleSeguroSctr,
+    ]),
   ],
   controllers: [
     LeadsServiceController,
@@ -48,6 +64,7 @@ import { DetalleSeguroSctrService } from './services/detalle-seguro-sctr.service
     DetalleSeguroAutoController,
     DetalleSeguroSaludController,
     DetalleSeguroSctrController,
+    CotizacionesController,
   ],
   providers: [
     LeadsServiceService,
@@ -57,6 +74,7 @@ import { DetalleSeguroSctrService } from './services/detalle-seguro-sctr.service
     DetalleSeguroAutoService,
     DetalleSeguroSaludService,
     DetalleSeguroSctrService,
+    CotizacionesService,
   ],
   exports: [
     LeadsServiceService,
@@ -66,6 +84,7 @@ import { DetalleSeguroSctrService } from './services/detalle-seguro-sctr.service
     DetalleSeguroAutoService,
     DetalleSeguroSaludService,
     DetalleSeguroSctrService,
+    CotizacionesService,
   ],
 })
 export class LeadsServiceModule {}
