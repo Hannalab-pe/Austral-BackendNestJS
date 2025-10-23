@@ -7,9 +7,13 @@ import { AuthServiceController } from './auth-service.controller';
 import { AuthServiceService } from './auth-service.service';
 import { RolesController } from './controllers/roles.controller';
 import { UsuariosController } from './controllers/usuarios.controller';
+import { PermisosController } from './controllers/permisos.controller';
+import { AuditoriaController } from './controllers/auditoria.controller';
 import { RolesService } from './services/roles.service';
 import { UsuariosService } from './services/usuarios.service';
-import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista } from './entities';
+import { PermisosService } from './services/permisos.service';
+import { AuditoriaService } from './services/auditoria.service';
+import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria } from './entities';
 import { JwtStrategy } from './strategies';
 
 @Module({
@@ -26,13 +30,13 @@ import { JwtStrategy } from './strategies';
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'austral_seguros'),
-        entities: [Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista],
+        entities: [Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria],
         synchronize: false, // NO modificar la BD existente
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista]),
+    TypeOrmModule.forFeature([Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -44,8 +48,8 @@ import { JwtStrategy } from './strategies';
       }),
     }),
   ],
-  controllers: [AuthServiceController, RolesController, UsuariosController],
-  providers: [AuthServiceService, RolesService, UsuariosService, JwtStrategy],
-  exports: [AuthServiceService, RolesService, UsuariosService, JwtModule],
+  controllers: [AuthServiceController, RolesController, UsuariosController, PermisosController, AuditoriaController],
+  providers: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, JwtStrategy],
+  exports: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, JwtModule],
 })
 export class AuthServiceModule { }

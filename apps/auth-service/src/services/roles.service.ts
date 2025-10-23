@@ -14,18 +14,18 @@ export class RolesService {
   constructor(
     @InjectRepository(Rol)
     private rolRepository: Repository<Rol>,
-  ) {}
+  ) { }
 
   async findAll(): Promise<Rol[]> {
     return await this.rolRepository.find({
-      where: { esta_activo: true },
+      where: { estaActivo: true },
       order: { nombre: 'ASC' },
     });
   }
 
   async findOne(id: string): Promise<Rol> {
     const rol = await this.rolRepository.findOne({
-      where: { id_rol: id, esta_activo: true },
+      where: { idRol: id, estaActivo: true },
     });
 
     if (!rol) {
@@ -48,7 +48,7 @@ export class RolesService {
     try {
       const newRol = this.rolRepository.create({
         ...createRolDto,
-        esta_activo: true,
+        estaActivo: true,
       });
 
       return await this.rolRepository.save(newRol);
@@ -79,13 +79,13 @@ export class RolesService {
     const rol = await this.findOne(id);
 
     // Soft delete - marcar como inactivo en lugar de eliminar
-    rol.esta_activo = false;
+    rol.estaActivo = false;
     await this.rolRepository.save(rol);
   }
 
   async findByName(nombre: string): Promise<Rol | null> {
     return await this.rolRepository.findOne({
-      where: { nombre, esta_activo: true },
+      where: { nombre, estaActivo: true },
     });
   }
 
@@ -94,22 +94,22 @@ export class RolesService {
       {
         nombre: 'Administrador',
         descripcion: 'Acceso completo al sistema',
-        nivel_acceso: 10,
+        nivelAcceso: 10,
       },
       {
         nombre: 'Gerente',
         descripcion: 'Acceso de gestión y supervisión',
-        nivel_acceso: 8,
+        nivelAcceso: 8,
       },
       {
         nombre: 'Vendedor',
         descripcion: 'Acceso para actividades de ventas',
-        nivel_acceso: 5,
+        nivelAcceso: 5,
       },
       {
         nombre: 'Asistente',
         descripcion: 'Acceso básico al sistema',
-        nivel_acceso: 3,
+        nivelAcceso: 3,
       },
     ];
 

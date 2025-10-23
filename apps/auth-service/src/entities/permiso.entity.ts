@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('permiso')
-@Index('idx_permiso_activo', ['esta_activo'])
+@Index('idx_permiso_activo', ['estaActivo'])
 export class Permiso {
-  @PrimaryGeneratedColumn('uuid')
-  id_permiso: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_permiso' })
+  idPermiso: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })
   nombre: string;
@@ -12,9 +12,9 @@ export class Permiso {
   @Column({ type: 'text', nullable: true })
   descripcion?: string;
 
-  @Column({ type: 'boolean', default: true })
-  esta_activo: boolean;
+  @Column({ type: 'boolean', default: true, name: 'esta_activo' })
+  estaActivo: boolean;
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
 }

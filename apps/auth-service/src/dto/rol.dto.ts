@@ -32,7 +32,7 @@ export class CreateRolDto {
   })
   @IsOptional()
   @IsNumber()
-  nivel_acceso?: number;
+  nivelAcceso?: number;
 }
 
 export class UpdateRolDto {
@@ -61,7 +61,7 @@ export class UpdateRolDto {
   })
   @IsOptional()
   @IsNumber()
-  nivel_acceso?: number;
+  nivelAcceso?: number;
 
   @ApiProperty({
     description: 'Estado activo del rol',
@@ -70,5 +70,5 @@ export class UpdateRolDto {
   })
   @IsOptional()
   @IsBoolean()
-  esta_activo?: boolean;
+  estaActivo?: boolean;
 }

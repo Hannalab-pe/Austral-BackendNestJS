@@ -9,8 +9,8 @@ import { Repository, Like } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
 
 export interface UsuarioFiltros {
-    esta_activo?: boolean;
-    id_rol?: string;
+    estaActivo?: boolean;
+    idRol?: string;
     search?: string; // Búsqueda por nombre, apellido, email o nombre_usuario
 }
 
@@ -35,32 +35,32 @@ export class UsuariosService {
     async findAll(filtros?: UsuarioFiltros): Promise<Usuario[]> {
         const where: any = {};
 
-        if (filtros?.esta_activo !== undefined) {
-            where.esta_activo = filtros.esta_activo;
+        if (filtros?.estaActivo !== undefined) {
+            where.estaActivo = filtros.estaActivo;
         }
 
-        if (filtros?.id_rol) {
-            where.id_rol = filtros.id_rol;
+        if (filtros?.idRol) {
+            where.idRol = filtros.idRol;
         }
 
         const usuarios = await this.usuarioRepository.find({
             where,
-            order: { fecha_creacion: 'DESC' },
+            order: { fechaCreacion: 'DESC' },
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
             ], // Excluir contraseña e intentos_fallidos
         });
 
@@ -72,7 +72,7 @@ export class UsuariosService {
                     u.nombre.toLowerCase().includes(searchLower) ||
                     u.apellido.toLowerCase().includes(searchLower) ||
                     u.email.toLowerCase().includes(searchLower) ||
-                    u.nombre_usuario.toLowerCase().includes(searchLower),
+                    u.nombreUsuario.toLowerCase().includes(searchLower),
             );
         }
 
@@ -89,12 +89,12 @@ export class UsuariosService {
     ): Promise<UsuarioPaginado> {
         const where: any = {};
 
-        if (filtros?.esta_activo !== undefined) {
-            where.esta_activo = filtros.esta_activo;
+        if (filtros?.estaActivo !== undefined) {
+            where.estaActivo = filtros.estaActivo;
         }
 
-        if (filtros?.id_rol) {
-            where.id_rol = filtros.id_rol;
+        if (filtros?.idRol) {
+            where.idRol = filtros.idRol;
         }
 
         // Búsqueda por texto (simplificada para usar con TypeORM)
@@ -105,24 +105,24 @@ export class UsuariosService {
 
         const [usuarios, total] = await this.usuarioRepository.findAndCount({
             where,
-            order: { fecha_creacion: 'DESC' },
+            order: { fechaCreacion: 'DESC' },
             skip: (page - 1) * limit,
             take: limit,
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
             ],
         });
 
@@ -140,23 +140,23 @@ export class UsuariosService {
      */
     async findOne(id: string): Promise<Usuario> {
         const usuario = await this.usuarioRepository.findOne({
-            where: { id_usuario: id },
+            where: { idUsuario: id },
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
-                'intentos_fallidos',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
+                'intentosFallidos',
             ],
         });
 
@@ -172,22 +172,22 @@ export class UsuariosService {
      */
     async findByEmail(email: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
-            where: { email, esta_activo: true },
+            where: { email, estaActivo: true },
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
             ],
         });
     }
@@ -197,22 +197,22 @@ export class UsuariosService {
      */
     async findByUsername(nombre_usuario: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
-            where: { nombre_usuario, esta_activo: true },
+            where: { nombreUsuario: nombre_usuario, estaActivo: true },
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
             ],
         });
     }
@@ -239,21 +239,21 @@ export class UsuariosService {
                 where: { email: updateData.email },
             });
 
-            if (existingEmail && existingEmail.id_usuario !== id) {
+            if (existingEmail && existingEmail.idUsuario !== id) {
                 throw new ConflictException('El email ya está en uso');
             }
         }
 
         // Verificar si el nombre de usuario ya está en uso
         if (
-            updateData.nombre_usuario &&
-            updateData.nombre_usuario !== usuario.nombre_usuario
+            updateData.nombreUsuario &&
+            updateData.nombreUsuario !== usuario.nombreUsuario
         ) {
             const existingUsername = await this.usuarioRepository.findOne({
-                where: { nombre_usuario: updateData.nombre_usuario },
+                where: { nombreUsuario: updateData.nombreUsuario },
             });
 
-            if (existingUsername && existingUsername.id_usuario !== id) {
+            if (existingUsername && existingUsername.idUsuario !== id) {
                 throw new ConflictException('El nombre de usuario ya está en uso');
             }
         }
@@ -267,9 +267,9 @@ export class UsuariosService {
      */
     async activate(id: string): Promise<Usuario> {
         const usuario = await this.findOne(id);
-        usuario.esta_activo = true;
-        usuario.cuenta_bloqueada = false;
-        usuario.intentos_fallidos = 0;
+        usuario.estaActivo = true;
+        usuario.cuentaBloqueada = false;
+        usuario.intentosFallidos = 0;
         return await this.usuarioRepository.save(usuario);
     }
 
@@ -278,7 +278,7 @@ export class UsuariosService {
      */
     async deactivate(id: string): Promise<void> {
         const usuario = await this.findOne(id);
-        usuario.esta_activo = false;
+        usuario.estaActivo = false;
         await this.usuarioRepository.save(usuario);
     }
 
@@ -287,7 +287,7 @@ export class UsuariosService {
      */
     async block(id: string): Promise<Usuario> {
         const usuario = await this.findOne(id);
-        usuario.cuenta_bloqueada = true;
+        usuario.cuentaBloqueada = true;
         return await this.usuarioRepository.save(usuario);
     }
 
@@ -296,33 +296,33 @@ export class UsuariosService {
      */
     async unblock(id: string): Promise<Usuario> {
         const usuario = await this.findOne(id);
-        usuario.cuenta_bloqueada = false;
-        usuario.intentos_fallidos = 0;
+        usuario.cuentaBloqueada = false;
+        usuario.intentosFallidos = 0;
         return await this.usuarioRepository.save(usuario);
     }
 
     /**
      * Obtener usuarios por rol
      */
-    async findByRole(id_rol: string): Promise<Usuario[]> {
+    async findByRole(idRol: string): Promise<Usuario[]> {
         return await this.usuarioRepository.find({
-            where: { id_rol, esta_activo: true },
+            where: { idRol, estaActivo: true },
             order: { nombre: 'ASC' },
             select: [
-                'id_usuario',
-                'nombre_usuario',
+                'idUsuario',
+                'nombreUsuario',
                 'email',
                 'nombre',
                 'apellido',
                 'telefono',
-                'documento_identidad',
-                'id_asociado',
-                'supervisor_id',
-                'esta_activo',
-                'ultimo_acceso',
-                'cuenta_bloqueada',
-                'id_rol',
-                'fecha_creacion',
+                'documentoIdentidad',
+                'idAsociado',
+                'supervisorId',
+                'estaActivo',
+                'ultimoAcceso',
+                'cuentaBloqueada',
+                'idRol',
+                'fechaCreacion',
             ],
         });
     }
@@ -338,8 +338,8 @@ export class UsuariosService {
     }> {
         const [total, activos, bloqueados] = await Promise.all([
             this.usuarioRepository.count(),
-            this.usuarioRepository.count({ where: { esta_activo: true } }),
-            this.usuarioRepository.count({ where: { cuenta_bloqueada: true } }),
+            this.usuarioRepository.count({ where: { estaActivo: true } }),
+            this.usuarioRepository.count({ where: { cuentaBloqueada: true } }),
         ]);
 
         return {

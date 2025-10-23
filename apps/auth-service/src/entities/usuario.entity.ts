@@ -4,17 +4,20 @@ import {
   Column,
   CreateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Rol } from './rol.entity';
 
 @Entity('usuario')
 @Index('idx_usuario_email', ['email'])
-@Index('idx_usuario_activo', ['esta_activo'])
+@Index('idx_usuario_activo', ['estaActivo'])
 export class Usuario {
-  @PrimaryGeneratedColumn('uuid')
-  id_usuario: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_usuario' })
+  idUsuario: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
-  nombre_usuario: string;
+  @Column({ type: 'varchar', length: 50, unique: true, name: 'nombre_usuario' })
+  nombreUsuario: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
@@ -31,30 +34,34 @@ export class Usuario {
   @Column({ type: 'varchar', length: 20, nullable: true })
   telefono?: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  documento_identidad?: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'documento_identidad' })
+  documentoIdentidad?: string;
 
-  @Column({ type: 'uuid', nullable: true })
-  id_asociado?: string;
+  @Column({ type: 'uuid', nullable: true, name: 'id_asociado' })
+  idAsociado?: string;
 
-  @Column({ type: 'uuid', nullable: true })
-  supervisor_id?: string;
+  @Column({ type: 'uuid', nullable: true, name: 'supervisor_id' })
+  supervisorId?: string;
 
-  @Column({ type: 'boolean', default: true })
-  esta_activo: boolean;
+  @Column({ type: 'boolean', default: true, name: 'esta_activo' })
+  estaActivo: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
-  ultimo_acceso?: Date;
+  @Column({ type: 'timestamp', nullable: true, name: 'ultimo_acceso' })
+  ultimoAcceso?: Date;
 
-  @Column({ type: 'int', default: 0 })
-  intentos_fallidos: number;
+  @Column({ type: 'int', default: 0, name: 'intentos_fallidos' })
+  intentosFallidos: number;
 
-  @Column({ type: 'boolean', default: false })
-  cuenta_bloqueada: boolean;
+  @Column({ type: 'boolean', default: false, name: 'cuenta_bloqueada' })
+  cuentaBloqueada: boolean;
 
-  @Column({ type: 'uuid' })
-  id_rol: string;
+  @Column({ type: 'uuid', name: 'id_rol' })
+  idRol: string;
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @ManyToOne(() => Rol)
+  @JoinColumn({ name: 'id_rol' })
+  rol: Rol;
+
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
 }

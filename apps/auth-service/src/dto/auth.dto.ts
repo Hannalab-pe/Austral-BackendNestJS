@@ -36,7 +36,7 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 50)
-  nombre_usuario: string;
+  nombreUsuario: string;
 
   @ApiProperty({
     description: 'Email único del usuario',
@@ -92,7 +92,7 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   @Length(1, 20)
-  documento_identidad?: string;
+  documentoIdentidad?: string;
 
   @ApiProperty({
     description: 'ID del rol (UUID)',
@@ -100,7 +100,7 @@ export class RegisterDto {
   })
   @IsNotEmpty()
   @IsUUID()
-  id_rol: string;
+  idRol: string;
 }
 
 export class AuthResponseDto {
@@ -114,12 +114,12 @@ export class AuthResponseDto {
     description: 'Información del usuario',
   })
   user: {
-    id_usuario: string;
-    nombre_usuario: string;
+    idUsuario: string;
+    nombreUsuario: string;
     email: string;
     nombre: string;
     apellido: string;
-    id_rol: string;
+    idRol: string;
   };
 }
 
@@ -130,7 +130,7 @@ export class ChangePasswordDto {
   })
   @IsNotEmpty()
   @IsString()
-  contrasena_actual: string;
+  contrasenaActual: string;
 
   @ApiProperty({
     description: 'Nueva contraseña',
@@ -140,5 +140,5 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   @IsString()
   @Length(6, 255)
-  contrasena_nueva: string;
+  contrasenaNueva: string;
 }

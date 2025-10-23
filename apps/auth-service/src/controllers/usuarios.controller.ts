@@ -48,11 +48,11 @@ export class UsuariosController {
         const filtros: UsuarioFiltros = {};
 
         if (esta_activo !== undefined) {
-            filtros.esta_activo = esta_activo === 'true';
+            filtros.estaActivo = esta_activo === 'true';
         }
 
         if (id_rol) {
-            filtros.id_rol = id_rol;
+            filtros.idRol = id_rol;
         }
 
         if (search) {
@@ -86,11 +86,11 @@ export class UsuariosController {
         const filtros: UsuarioFiltros = {};
 
         if (esta_activo !== undefined) {
-            filtros.esta_activo = esta_activo === 'true';
+            filtros.estaActivo = esta_activo === 'true';
         }
 
         if (id_rol) {
-            filtros.id_rol = id_rol;
+            filtros.idRol = id_rol;
         }
 
         if (search) {

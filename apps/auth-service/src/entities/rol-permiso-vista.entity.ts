@@ -5,17 +5,17 @@ import { Permiso } from './permiso.entity';
 
 @Entity('rol_permiso_vista')
 export class RolPermisoVista {
-  @PrimaryColumn('uuid')
-  id_rol: string;
+  @PrimaryColumn('uuid', { name: 'id_rol' })
+  idRol: string;
 
-  @PrimaryColumn('uuid')
-  id_vista: string;
+  @PrimaryColumn('uuid', { name: 'id_vista' })
+  idVista: string;
 
-  @PrimaryColumn('uuid')
-  id_permiso: string;
+  @PrimaryColumn('uuid', { name: 'id_permiso' })
+  idPermiso: string;
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
 
   @ManyToOne(() => Rol)
   @JoinColumn({ name: 'id_rol' })

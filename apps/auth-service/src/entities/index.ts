@@ -5,3 +5,4 @@ export * from './vista.entity';
 export * from './permiso.entity';
 export * from './rol-vista.entity';
 export * from './rol-permiso-vista.entity';
+export * from './auditoria.entity';

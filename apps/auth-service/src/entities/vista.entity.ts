@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('vista')
-@Index('idx_vista_activa', ['esta_activa'])
+@Index('idx_vista_activa', ['estaActiva'])
 @Index('idx_vista_ruta', ['ruta'])
 export class Vista {
-  @PrimaryGeneratedColumn('uuid')
-  id_vista: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_vista' })
+  idVista: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })
   nombre: string;
@@ -16,9 +16,9 @@ export class Vista {
   @Column({ type: 'varchar', length: 255 })
   ruta: string;
 
-  @Column({ type: 'boolean', default: true })
-  esta_activa: boolean;
+  @Column({ type: 'boolean', default: true, name: 'esta_activa' })
+  estaActiva: boolean;
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
 }
