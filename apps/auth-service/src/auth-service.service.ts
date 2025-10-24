@@ -18,6 +18,7 @@ import {
   ChangePasswordDto,
   AuthResponseDto,
   CreateVendedorDto,
+  UpdateVendedorDto,
 } from './dto';
 
 @Injectable()
@@ -332,6 +333,161 @@ export class AuthServiceService {
         porcentajeComision: brokerVendedor.porcentajeComision,
         fechaAsignacion: brokerVendedor.fechaAsignacion,
       },
+    };
+  }
+
+  async getVendedoresByBroker(brokerId: string) {
+    // Verificar que el broker existe y tiene rol de Broker
+    const broker = await this.usuarioRepository.findOne({
+      where: { idUsuario: brokerId, estaActivo: true },
+      relations: ['rol'],
+    });
+
+    if (!broker) {
+      throw new BadRequestException('Broker no encontrado');
+    }
+
+    if (broker.rol.nombre !== 'Broker') {
+      throw new ForbiddenException('Solo los Brokers pueden acceder a esta información');
+    }
+
+    // Obtener todos los vendedores asignados a este broker
+    const brokerVendedores = await this.brokerVendedorRepository.find({
+      where: { idBroker: brokerId, estaActivo: true },
+      relations: ['vendedor', 'vendedor.rol'],
+      order: { fechaAsignacion: 'DESC' },
+    });
+
+    // Formatear la respuesta
+    const vendedores = brokerVendedores.map(bv => ({
+      idUsuario: bv.vendedor.idUsuario,
+      nombreUsuario: bv.vendedor.nombreUsuario,
+      email: bv.vendedor.email,
+      nombre: bv.vendedor.nombre,
+      apellido: bv.vendedor.apellido,
+      telefono: bv.vendedor.telefono,
+      documentoIdentidad: bv.vendedor.documentoIdentidad,
+      estaActivo: bv.vendedor.estaActivo,
+      ultimoAcceso: bv.vendedor.ultimoAcceso,
+      fechaCreacion: bv.vendedor.fechaCreacion,
+      cuentaBloqueada: bv.vendedor.cuentaBloqueada,
+      porcentajeComision: bv.porcentajeComision,
+      fechaAsignacion: bv.fechaAsignacion,
+      rol: bv.vendedor.rol,
+    }));
+
+    return {
+      vendedores,
+      total: vendedores.length,
+      activos: vendedores.filter(v => v.estaActivo).length,
+    };
+  }
+
+  async updateVendedor(brokerId: string, vendedorId: string, updateVendedorDto: UpdateVendedorDto) {
+    // Verificar que el broker existe y tiene rol de Broker
+    const broker = await this.usuarioRepository.findOne({
+      where: { idUsuario: brokerId, estaActivo: true },
+      relations: ['rol'],
+    });
+
+    if (!broker) {
+      throw new BadRequestException('Broker no encontrado');
+    }
+
+    if (broker.rol.nombre !== 'Broker') {
+      throw new ForbiddenException('Solo los Brokers pueden actualizar Vendedores');
+    }
+
+    // Verificar que el vendedor existe y está asignado a este broker
+    const brokerVendedor = await this.brokerVendedorRepository.findOne({
+      where: {
+        idBroker: brokerId,
+        idVendedor: vendedorId,
+        estaActivo: true
+      },
+      relations: ['vendedor'],
+    });
+
+    if (!brokerVendedor) {
+      throw new ForbiddenException('Vendedor no encontrado o no asignado a este broker');
+    }
+
+    // Verificar si el email o nombre de usuario ya existe (si se están actualizando)
+    if (updateVendedorDto.email || updateVendedorDto.nombreUsuario) {
+      const whereConditions: any[] = [];
+      if (updateVendedorDto.email) {
+        whereConditions.push({ email: updateVendedorDto.email });
+      }
+      if (updateVendedorDto.nombreUsuario) {
+        whereConditions.push({ nombreUsuario: updateVendedorDto.nombreUsuario });
+      }
+
+      const existingUser = await this.usuarioRepository.findOne({
+        where: whereConditions.length > 1 ? whereConditions : whereConditions[0],
+      });
+
+      if (existingUser && existingUser.idUsuario !== vendedorId) {
+        throw new ConflictException(
+          'El email o nombre de usuario ya está en uso por otro usuario',
+        );
+      }
+    }
+
+    // Actualizar el usuario vendedor
+    const updateData: any = {};
+    if (updateVendedorDto.nombreUsuario) updateData.nombreUsuario = updateVendedorDto.nombreUsuario;
+    if (updateVendedorDto.email) updateData.email = updateVendedorDto.email;
+    if (updateVendedorDto.telefono !== undefined) updateData.telefono = updateVendedorDto.telefono;
+
+    if (Object.keys(updateData).length > 0) {
+      await this.usuarioRepository.update(vendedorId, updateData);
+    }
+
+    // Actualizar la relación broker-vendedor si se cambió el porcentaje
+    if (updateVendedorDto.porcentajeComision !== undefined) {
+      await this.brokerVendedorRepository.update(
+        { idBroker: brokerId, idVendedor: vendedorId },
+        { porcentajeComision: updateVendedorDto.porcentajeComision }
+      );
+    }
+
+    // Retornar el vendedor actualizado
+    const updatedVendedor = await this.usuarioRepository.findOne({
+      where: { idUsuario: vendedorId },
+      relations: ['rol'],
+    });
+
+    if (!updatedVendedor) {
+      throw new BadRequestException('Error al recuperar el vendedor actualizado');
+    }
+
+    // Obtener la relación actualizada
+    const updatedBrokerVendedor = await this.brokerVendedorRepository.findOne({
+      where: { idBroker: brokerId, idVendedor: vendedorId },
+    });
+
+    return {
+      vendedor: {
+        idUsuario: updatedVendedor.idUsuario,
+        nombreUsuario: updatedVendedor.nombreUsuario,
+        email: updatedVendedor.email,
+        nombre: updatedVendedor.nombre,
+        apellido: updatedVendedor.apellido,
+        telefono: updatedVendedor.telefono,
+        documentoIdentidad: updatedVendedor.documentoIdentidad,
+        estaActivo: updatedVendedor.estaActivo,
+        ultimoAcceso: updatedVendedor.ultimoAcceso,
+        fechaCreacion: updatedVendedor.fechaCreacion,
+        cuentaBloqueada: updatedVendedor.cuentaBloqueada,
+        idRol: updatedVendedor.idRol,
+        rol: updatedVendedor.rol,
+      },
+      brokerVendedor: updatedBrokerVendedor ? {
+        idBroker: updatedBrokerVendedor.idBroker,
+        idVendedor: updatedBrokerVendedor.idVendedor,
+        porcentajeComision: updatedBrokerVendedor.porcentajeComision,
+        fechaAsignacion: updatedBrokerVendedor.fechaAsignacion,
+      } : null,
     };
   }
 }

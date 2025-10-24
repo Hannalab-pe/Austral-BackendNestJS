@@ -3,3 +3,4 @@ export * from './rol.dto';
 export * from './permisos.dto';
 export * from './usuario.dto';
 export * from './create-vendedor.dto';
+export * from './update-vendedor.dto';

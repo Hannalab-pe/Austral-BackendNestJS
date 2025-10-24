@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Patch,
+  Param,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,6 +14,7 @@ import {
   ApiResponse,
   ApiBody,
   ApiBearerAuth,
+  ApiParam,
 } from '@nestjs/swagger';
 import { AuthServiceService } from './auth-service.service';
 import {
@@ -21,6 +23,7 @@ import {
   ChangePasswordDto,
   AuthResponseDto,
   CreateVendedorDto,
+  UpdateVendedorDto,
 } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -107,6 +110,51 @@ export class AuthServiceController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Patch('vendedores/:id')
+  @ApiOperation({
+    summary: 'Actualizar vendedor (solo Brokers)',
+    description: 'Permitir que un Broker actualice información limitada de un Vendedor asignado',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del vendedor a actualizar',
+    example: 'usr_123456',
+  })
+  @ApiBody({ type: UpdateVendedorDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Vendedor actualizado exitosamente',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Solo los Brokers pueden actualizar Vendedores o vendedor no asignado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vendedor no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El email o nombre de usuario ya existe',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+  })
+  async updateVendedor(
+    @Request() req,
+    @Param('id') vendedorId: string,
+    @Body() updateVendedorDto: UpdateVendedorDto,
+  ) {
+    return this.authServiceService.updateVendedor(
+      req.user.userId,
+      vendedorId,
+      updateVendedorDto,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('change-password')
   @ApiOperation({
     summary: 'Cambiar contraseña',
@@ -171,5 +219,28 @@ export class AuthServiceController {
   })
   async validateToken(@Request() req) {
     return { valid: true, user: req.user };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('my-vendedores')
+  @ApiOperation({
+    summary: 'Obtener vendedores del Broker actual',
+    description: 'Obtener la lista de vendedores asignados al Broker autenticado',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de vendedores obtenida exitosamente',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Solo los Brokers pueden acceder a esta información',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+  })
+  async getMyVendedores(@Request() req) {
+    return this.authServiceService.getVendedoresByBroker(req.user.userId);
   }
 }
