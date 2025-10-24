@@ -13,12 +13,13 @@ import { FuenteLead } from './fuente-lead.entity';
 @Entity('lead')
 @Index('idx_lead_activo', ['esta_activo'])
 @Index('idx_lead_asignado', ['asignado_a_usuario'])
+@Index('idx_lead_cumpleanos', ['fecha_nacimiento'])
 @Index('idx_lead_estado', ['id_estado'])
 @Index('idx_lead_seguimiento', ['proxima_fecha_seguimiento'])
 @Index('idx_lead_telefono', ['telefono'])
 export class Lead {
-  @PrimaryGeneratedColumn('uuid')
-  id_lead: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_lead' })
+  idLead: string;
 
   @Column({ type: 'varchar', length: 100 })
   nombre: string;

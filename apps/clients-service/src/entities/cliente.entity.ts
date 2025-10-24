@@ -3,74 +3,90 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Index,
+  OneToMany,
 } from 'typeorm';
+import { ClienteContacto } from './cliente-contacto.entity';
+import { ClienteDocumento } from './cliente-documento.entity';
 
-@Entity('clientes')
+@Entity('cliente')
+@Index('idx_cliente_activo', ['estaActivo'])
+@Index('idx_cliente_asignado', ['asignadoA'])
+@Index('idx_cliente_cumpleanos', ['cumpleanos'])
+@Index('idx_cliente_documento', ['numeroDocumento'])
+@Index('idx_cliente_email_notif', ['emailNotificaciones'])
+@Index('idx_cliente_registrado_por', ['registradoPor'])
+@Index('idx_cliente_tipo_persona', ['tipoPersona'])
 export class Cliente {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid', { name: 'id_cliente' })
+  idCliente: string;
 
-  @Column()
-  nombre: string;
+  @Column({ type: 'varchar', length: 20, name: 'tipo_persona' })
+  tipoPersona: string; // 'NATURAL' o 'JURIDICO'
 
-  @Column()
-  apellido: string;
+  @Column({ type: 'varchar', length: 300, nullable: true, name: 'razon_social' })
+  razonSocial?: string;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  nombres?: string;
 
-  @Column()
-  telefono: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  apellidos?: string;
 
-  @Column({ nullable: true })
-  telefonoSecundario?: string;
-
-  @Column({ unique: true })
-  numeroDocumento: string;
-
-  @Column()
+  @Column({ type: 'varchar', length: 20, name: 'tipo_documento' })
   tipoDocumento: string;
 
-  @Column({ type: 'date' })
-  fechaNacimiento: Date;
+  @Column({ type: 'varchar', length: 20, name: 'numero_documento' })
+  numeroDocumento: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   direccion: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   distrito?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   provincia?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   departamento?: string;
 
-  @Column({ nullable: true })
-  ocupacion?: string;
+  @Column({ type: 'varchar', length: 20, name: 'telefono_1' })
+  telefono1: string;
 
-  @Column({ nullable: true })
-  empresa?: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono_2' })
+  telefono2?: string;
 
-  @Column({ nullable: true })
-  estadoCivil?: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  whatsapp?: string;
 
-  @Column({ nullable: true })
-  contactoEmergenciaNombre?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'email_notificaciones' })
+  emailNotificaciones?: string;
 
-  @Column({ nullable: true })
-  contactoEmergenciaTelefono?: string;
+  @Column({ type: 'boolean', default: true, name: 'recibir_notificaciones' })
+  recibirNotificaciones: boolean;
 
-  @Column({ nullable: true })
-  contactoEmergenciaRelacion?: string;
+  @Column({ type: 'date', nullable: true })
+  cumpleanos?: Date;
 
-  @Column({ default: true })
-  activo: boolean;
+  @Column({ type: 'boolean', default: true, name: 'esta_activo' })
+  estaActivo: boolean;
 
-  @CreateDateColumn()
-  fechaCreacion: Date;
+  @Column({ type: 'uuid', nullable: true, name: 'id_lead' })
+  idLead?: string;
 
-  @UpdateDateColumn()
-  fechaActualizacion: Date;
+  @Column({ type: 'uuid', nullable: true, name: 'asignado_a' })
+  asignadoA?: string;
+
+  @Column({ type: 'uuid', nullable: true, name: 'registrado_por' })
+  registradoPor?: string;
+
+  @OneToMany(() => ClienteContacto, contacto => contacto.cliente)
+  contactos: ClienteContacto[];
+
+  @OneToMany(() => ClienteDocumento, documento => documento.cliente)
+  documentos: ClienteDocumento[];
+
+  @CreateDateColumn({ name: 'fecha_registro' })
+  fechaRegistro: Date;
 }

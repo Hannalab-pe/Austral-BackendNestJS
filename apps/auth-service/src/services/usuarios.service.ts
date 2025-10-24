@@ -7,6 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
+import { Rol } from '../entities/rol.entity';
+import * as bcrypt from 'bcrypt';
 
 export interface UsuarioFiltros {
     estaActivo?: boolean;
@@ -27,6 +29,8 @@ export class UsuariosService {
     constructor(
         @InjectRepository(Usuario)
         private usuarioRepository: Repository<Usuario>,
+        @InjectRepository(Rol)
+        private rolRepository: Repository<Rol>,
     ) { }
 
     /**
@@ -45,6 +49,7 @@ export class UsuariosService {
 
         const usuarios = await this.usuarioRepository.find({
             where,
+            relations: ['rol'],
             order: { fechaCreacion: 'DESC' },
             select: [
                 'idUsuario',
@@ -54,8 +59,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',
@@ -116,8 +119,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',
@@ -136,11 +137,48 @@ export class UsuariosService {
     }
 
     /**
-     * Obtener un usuario por ID
+     * Crear un nuevo usuario
      */
+    async create(createData: Partial<Usuario>): Promise<Usuario> {
+        // Verificar si el email ya está en uso
+        if (createData.email) {
+            const existingEmail = await this.usuarioRepository.findOne({
+                where: { email: createData.email },
+            });
+            if (existingEmail) {
+                throw new ConflictException('El email ya está en uso');
+            }
+        }
+
+        // Verificar si el nombre de usuario ya está en uso
+        if (createData.nombreUsuario) {
+            const existingUsername = await this.usuarioRepository.findOne({
+                where: { nombreUsuario: createData.nombreUsuario },
+            });
+            if (existingUsername) {
+                throw new ConflictException('El nombre de usuario ya está en uso');
+            }
+        }
+
+        // Hash de la contraseña si está presente
+        if (createData.contrasena) {
+            createData.contrasena = await bcrypt.hash(createData.contrasena, 12);
+        }
+
+        // Crear el usuario con valores por defecto
+        const newUser = this.usuarioRepository.create({
+            ...createData,
+            estaActivo: true,
+            intentosFallidos: 0,
+            cuentaBloqueada: false,
+        });
+
+        return await this.usuarioRepository.save(newUser);
+    }
     async findOne(id: string): Promise<Usuario> {
         const usuario = await this.usuarioRepository.findOne({
             where: { idUsuario: id },
+            relations: ['rol'],
             select: [
                 'idUsuario',
                 'nombreUsuario',
@@ -149,8 +187,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',
@@ -173,6 +209,7 @@ export class UsuariosService {
     async findByEmail(email: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
             where: { email, estaActivo: true },
+            relations: ['rol'],
             select: [
                 'idUsuario',
                 'nombreUsuario',
@@ -181,8 +218,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',
@@ -198,6 +233,7 @@ export class UsuariosService {
     async findByUsername(nombre_usuario: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
             where: { nombreUsuario: nombre_usuario, estaActivo: true },
+            relations: ['rol'],
             select: [
                 'idUsuario',
                 'nombreUsuario',
@@ -206,8 +242,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',
@@ -307,6 +341,7 @@ export class UsuariosService {
     async findByRole(idRol: string): Promise<Usuario[]> {
         return await this.usuarioRepository.find({
             where: { idRol, estaActivo: true },
+            relations: ['rol'],
             order: { nombre: 'ASC' },
             select: [
                 'idUsuario',
@@ -316,8 +351,6 @@ export class UsuariosService {
                 'apellido',
                 'telefono',
                 'documentoIdentidad',
-                'idAsociado',
-                'supervisorId',
                 'estaActivo',
                 'ultimoAcceso',
                 'cuentaBloqueada',

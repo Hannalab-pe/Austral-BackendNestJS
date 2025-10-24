@@ -37,12 +37,6 @@ export class Usuario {
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'documento_identidad' })
   documentoIdentidad?: string;
 
-  @Column({ type: 'uuid', nullable: true, name: 'id_asociado' })
-  idAsociado?: string;
-
-  @Column({ type: 'uuid', nullable: true, name: 'supervisor_id' })
-  supervisorId?: string;
-
   @Column({ type: 'boolean', default: true, name: 'esta_activo' })
   estaActivo: boolean;
 

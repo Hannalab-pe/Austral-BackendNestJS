@@ -1,6 +1,7 @@
 import {
     Controller,
     Get,
+    Post,
     Put,
     Patch,
     Param,
@@ -9,6 +10,8 @@ import {
     UseGuards,
     ParseIntPipe,
     DefaultValuePipe,
+    Request,
+    BadRequestException,
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -16,10 +19,12 @@ import {
     ApiResponse,
     ApiBearerAuth,
     ApiQuery,
+    ApiBody,
 } from '@nestjs/swagger';
 import { UsuariosService, UsuarioFiltros } from '../services/usuarios.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { Usuario } from '../entities/usuario.entity';
+import { CreateUsuarioDto } from '../dto/usuario.dto';
 
 @ApiTags('usuarios')
 @Controller('usuarios')
@@ -28,19 +33,45 @@ import { Usuario } from '../entities/usuario.entity';
 export class UsuariosController {
     constructor(private readonly usuariosService: UsuariosService) { }
 
+    @Post()
+    @ApiOperation({
+        summary: 'Crear nuevo usuario',
+        description: 'Crea un nuevo usuario con los datos básicos y rol especificado',
+    })
+    @ApiBody({ type: CreateUsuarioDto })
+    @ApiResponse({
+        status: 201,
+        description: 'Usuario creado exitosamente',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'Datos inválidos',
+    })
+    @ApiResponse({
+        status: 409,
+        description: 'Email o nombre de usuario ya existe',
+    })
+    async create(
+        @Body() createUsuarioDto: CreateUsuarioDto,
+    ): Promise<Usuario> {
+        // Crear el usuario
+        return this.usuariosService.create(createUsuarioDto);
+    }
+
     @Get()
     @ApiOperation({
-        summary: 'Obtener todos los usuarios',
-        description: 'Lista todos los usuarios con filtros opcionales',
+        summary: 'Obtener usuarios',
+        description: 'Lista usuarios con filtros opcionales',
     })
     @ApiQuery({ name: 'esta_activo', required: false, type: Boolean })
     @ApiQuery({ name: 'id_rol', required: false, type: String })
     @ApiQuery({ name: 'search', required: false, type: String })
     @ApiResponse({
         status: 200,
-        description: 'Lista de usuarios obtenida exitosamente',
+        description: 'Lista de usuarios obtenida exitosamente según jerarquía',
     })
     async findAll(
+        @Request() req: any,
         @Query('esta_activo') esta_activo?: string,
         @Query('id_rol') id_rol?: string,
         @Query('search') search?: string,
@@ -59,6 +90,7 @@ export class UsuariosController {
             filtros.search = search;
         }
 
+        // Obtener usuarios filtrados
         return this.usuariosService.findAll(filtros);
     }
 
@@ -77,6 +109,7 @@ export class UsuariosController {
         description: 'Lista paginada de usuarios obtenida exitosamente',
     })
     async findAllPaginated(
+        @Request() req: any,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Query('esta_activo') esta_activo?: string,
@@ -97,7 +130,21 @@ export class UsuariosController {
             filtros.search = search;
         }
 
-        return this.usuariosService.findAllPaginated(page, limit, filtros);
+        // Obtener usuarios filtrados por jerarquía
+        const allUsers = await this.usuariosService.findAll(filtros);
+
+        // Aplicar paginación manualmente
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedUsers = allUsers.slice(startIndex, endIndex);
+
+        return {
+            data: paginatedUsers,
+            total: allUsers.length,
+            page,
+            limit,
+            totalPages: Math.ceil(allUsers.length / limit),
+        };
     }
 
     @Get('stats')
@@ -163,6 +210,7 @@ export class UsuariosController {
     async update(
         @Param('id') id: string,
         @Body() updateData: Partial<Usuario>,
+        @Request() req: any,
     ): Promise<Usuario> {
         return this.usuariosService.update(id, updateData);
     }

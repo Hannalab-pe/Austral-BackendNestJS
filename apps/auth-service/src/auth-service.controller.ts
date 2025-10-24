@@ -20,13 +20,14 @@ import {
   RegisterDto,
   ChangePasswordDto,
   AuthResponseDto,
+  CreateVendedorDto,
 } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthServiceController {
-  constructor(private readonly authServiceService: AuthServiceService) {}
+  constructor(private readonly authServiceService: AuthServiceService) { }
 
   @Post('login')
   @ApiOperation({
@@ -68,6 +69,40 @@ export class AuthServiceController {
   })
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
     return this.authServiceService.register(registerDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('create-vendedor')
+  @ApiOperation({
+    summary: 'Crear vendedor (solo Brokers)',
+    description: 'Permitir que un Broker cree un nuevo Vendedor y asigne porcentaje de comisión',
+  })
+  @ApiBody({ type: CreateVendedorDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Vendedor creado exitosamente',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Solo los Brokers pueden crear Vendedores',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El email o nombre de usuario ya existe',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+  })
+  async createVendedor(
+    @Request() req,
+    @Body() createVendedorDto: CreateVendedorDto,
+  ) {
+    return this.authServiceService.createVendedor(
+      req.user.userId,
+      createVendedorDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

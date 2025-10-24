@@ -13,7 +13,7 @@ import { RolesService } from './services/roles.service';
 import { UsuariosService } from './services/usuarios.service';
 import { PermisosService } from './services/permisos.service';
 import { AuditoriaService } from './services/auditoria.service';
-import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria } from './entities';
+import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria, BrokerVendedor } from './entities';
 import { JwtStrategy } from './strategies';
 
 @Module({
@@ -30,13 +30,13 @@ import { JwtStrategy } from './strategies';
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'austral_seguros'),
-        entities: [Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria],
+        entities: [Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria, BrokerVendedor],
         synchronize: false, // NO modificar la BD existente
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria]),
+    TypeOrmModule.forFeature([Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria, BrokerVendedor]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],

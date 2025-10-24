@@ -1,17 +1,19 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn, CreateDateColumn, Index } from 'typeorm';
 import { Rol } from './rol.entity';
 import { Vista } from './vista.entity';
 
 @Entity('rol_vista')
+@Index('idx_rol_vista_rol', ['idRol'])
+@Index('idx_rol_vista_vista', ['idVista'])
 export class RolVista {
-  @PrimaryColumn('uuid')
-  id_rol: string;
+  @PrimaryColumn('uuid', { name: 'id_rol' })
+  idRol: string;
 
-  @PrimaryColumn('uuid')
-  id_vista: string;
+  @PrimaryColumn('uuid', { name: 'id_vista' })
+  idVista: string;
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
 
   @ManyToOne(() => Rol)
   @JoinColumn({ name: 'id_rol' })

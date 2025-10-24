@@ -6,3 +6,4 @@ export * from './permiso.entity';
 export * from './rol-vista.entity';
 export * from './rol-permiso-vista.entity';
 export * from './auditoria.entity';
+export * from './broker-vendedor.entity';

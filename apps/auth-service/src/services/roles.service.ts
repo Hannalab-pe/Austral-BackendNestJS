@@ -97,8 +97,8 @@ export class RolesService {
         nivelAcceso: 10,
       },
       {
-        nombre: 'Gerente',
-        descripcion: 'Acceso de gestión y supervisión',
+        nombre: 'Broker',
+        descripcion: 'Puede registrar vendedores y gestionar sus subordinados',
         nivelAcceso: 8,
       },
       {

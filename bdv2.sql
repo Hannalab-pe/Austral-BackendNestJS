@@ -392,16 +392,19 @@ CREATE TABLE cliente (
 	fecha_registro timestamp DEFAULT now() NULL,
 	id_lead uuid NULL,
 	broker_asignado uuid NULL,
+	registrado_por uuid NULL,
 	CONSTRAINT cliente_documento_identidad_key UNIQUE (documento_identidad),
 	CONSTRAINT cliente_pkey PRIMARY KEY (id_cliente),
 	CONSTRAINT cliente_broker_asignado_fkey FOREIGN KEY (broker_asignado) REFERENCES usuario(id_usuario),
-	CONSTRAINT cliente_id_lead_fkey FOREIGN KEY (id_lead) REFERENCES "lead"(id_lead)
+	CONSTRAINT cliente_id_lead_fkey FOREIGN KEY (id_lead) REFERENCES "lead"(id_lead),
+	CONSTRAINT cliente_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES usuario(id_usuario)
 );
 CREATE INDEX idx_cliente_activo ON public.cliente USING btree (esta_activo);
 CREATE INDEX idx_cliente_broker ON public.cliente USING btree (broker_asignado);
 CREATE INDEX idx_cliente_cumpleanos ON public.cliente USING btree (EXTRACT(month FROM fecha_nacimiento), EXTRACT(day FROM fecha_nacimiento));
 CREATE INDEX idx_cliente_documento ON public.cliente USING btree (documento_identidad);
 CREATE INDEX idx_cliente_email ON public.cliente USING btree (email);
+CREATE INDEX idx_cliente_registrado_por ON public.cliente USING btree (registrado_por);
 
 
 -- public.detalle_seguro_auto definition
