@@ -5,21 +5,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ContactoCliente } from '../entities/contacto-cliente.entity';
+import { ClienteContacto } from '../entities/cliente-contacto.entity';
 import { CreateContactoClienteDto, UpdateContactoClienteDto } from '../dto';
 
 @Injectable()
 export class ContactosClienteService {
   constructor(
-    @InjectRepository(ContactoCliente)
-    private readonly contactoRepository: Repository<ContactoCliente>,
-  ) {}
+    @InjectRepository(ClienteContacto)
+    private readonly contactoRepository: Repository<ClienteContacto>,
+  ) { }
 
   async findAll(page: number = 1, limit: number = 10) {
     const [data, total] = await this.contactoRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { id: 'DESC' },
+      order: { fechaCreacion: 'DESC' },
     });
 
     return {
@@ -31,9 +31,9 @@ export class ContactosClienteService {
     };
   }
 
-  async findOne(id: number): Promise<ContactoCliente> {
+  async findOne(id: string): Promise<ClienteContacto> {
     const contacto = await this.contactoRepository.findOne({
-      where: { id },
+      where: { idContacto: id },
     });
 
     if (!contacto) {
@@ -45,11 +45,10 @@ export class ContactosClienteService {
 
   async create(
     createContactoDto: CreateContactoClienteDto,
-  ): Promise<ContactoCliente> {
+  ): Promise<ClienteContacto> {
     try {
       const contacto = this.contactoRepository.create({
         ...createContactoDto,
-        activo: true,
       });
       return await this.contactoRepository.save(contacto);
     } catch (error) {
@@ -58,31 +57,24 @@ export class ContactosClienteService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateContactoDto: UpdateContactoClienteDto,
-  ): Promise<ContactoCliente> {
+  ): Promise<ClienteContacto> {
     const contacto = await this.findOne(id);
 
     Object.assign(contacto, updateContactoDto);
     return await this.contactoRepository.save(contacto);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const contacto = await this.findOne(id);
     await this.contactoRepository.remove(contacto);
   }
 
-  async findByCliente(clienteId: number): Promise<ContactoCliente[]> {
+  async findByCliente(clienteId: string): Promise<ClienteContacto[]> {
     return await this.contactoRepository.find({
-      where: { clienteId },
-      order: { id: 'ASC' },
-    });
-  }
-
-  async findByTipo(tipo: string): Promise<ContactoCliente[]> {
-    return await this.contactoRepository.find({
-      where: { tipo },
-      order: { id: 'DESC' },
+      where: { idCliente: clienteId },
+      order: { fechaCreacion: 'ASC' },
     });
   }
 }

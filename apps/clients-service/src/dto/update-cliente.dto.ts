@@ -2,53 +2,69 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsEmail, IsDateString, IsBoolean, Length } from 'class-validator';
 
 export class UpdateClienteDto {
-  @ApiProperty({ description: 'Nombre del cliente', required: false })
+  @ApiProperty({ description: 'Tipo de persona', required: false, enum: ['NATURAL', 'JURIDICO'] })
+  @IsOptional()
+  @IsString()
+  tipoPersona?: string;
+
+  @ApiProperty({ description: 'Tipo de documento', required: false, enum: ['DNI', 'CEDULA', 'PASAPORTE', 'RUC'] })
+  @IsOptional()
+  @IsString()
+  tipoDocumento?: string;
+
+  @ApiProperty({ description: 'Número de documento', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(1, 20)
+  numeroDocumento?: string;
+
+  @ApiProperty({ description: 'Nombres', required: false })
   @IsOptional()
   @IsString()
   @Length(1, 100)
-  nombre?: string;
+  nombres?: string;
 
-  @ApiProperty({ description: 'Apellido del cliente', required: false })
+  @ApiProperty({ description: 'Apellidos', required: false })
   @IsOptional()
   @IsString()
   @Length(1, 100)
-  apellido?: string;
+  apellidos?: string;
 
-  @ApiProperty({ description: 'Email del cliente', required: false })
+  @ApiProperty({ description: 'Razón social', required: false })
   @IsOptional()
-  @IsEmail()
-  email?: string;
+  @IsString()
+  @Length(1, 300)
+  razonSocial?: string;
 
   @ApiProperty({ description: 'Teléfono principal', required: false })
   @IsOptional()
   @IsString()
   @Length(1, 20)
-  telefono?: string;
+  telefono1?: string;
 
   @ApiProperty({ description: 'Teléfono secundario', required: false })
   @IsOptional()
   @IsString()
   @Length(1, 20)
-  telefonoSecundario?: string;
+  telefono2?: string;
 
-  @ApiProperty({ description: 'Número de documento de identidad', required: false })
+  @ApiProperty({ description: 'WhatsApp', required: false })
   @IsOptional()
   @IsString()
   @Length(1, 20)
-  documentoIdentidad?: string;
+  whatsapp?: string;
 
-  @ApiProperty({ description: 'Tipo de documento', required: false })
+  @ApiProperty({ description: 'Email para notificaciones', required: false })
   @IsOptional()
-  @IsString()
-  @Length(1, 10)
-  tipoDocumento?: string;
+  @IsEmail()
+  emailNotificaciones?: string;
 
-  @ApiProperty({ description: 'Fecha de nacimiento', required: false })
+  @ApiProperty({ description: 'Recibir notificaciones', required: false })
   @IsOptional()
-  @IsDateString()
-  fechaNacimiento?: Date;
+  @IsBoolean()
+  recibirNotificaciones?: boolean;
 
-  @ApiProperty({ description: 'Dirección completa', required: false })
+  @ApiProperty({ description: 'Dirección', required: false })
   @IsOptional()
   @IsString()
   direccion?: string;
@@ -71,44 +87,23 @@ export class UpdateClienteDto {
   @Length(1, 100)
   departamento?: string;
 
-  @ApiProperty({ description: 'Ocupación', required: false })
+  @ApiProperty({ description: 'Fecha de cumpleaños', required: false })
   @IsOptional()
-  @IsString()
-  @Length(1, 150)
-  ocupacion?: string;
-
-  @ApiProperty({ description: 'Empresa donde trabaja', required: false })
-  @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  empresa?: string;
-
-  @ApiProperty({ description: 'Estado civil', required: false })
-  @IsOptional()
-  @IsString()
-  @Length(1, 20)
-  estadoCivil?: string;
-
-  @ApiProperty({ description: 'Nombre del contacto de emergencia', required: false })
-  @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  contactoEmergenciaNombre?: string;
-
-  @ApiProperty({ description: 'Teléfono del contacto de emergencia', required: false })
-  @IsOptional()
-  @IsString()
-  @Length(1, 20)
-  contactoEmergenciaTelefono?: string;
-
-  @ApiProperty({ description: 'Relación con el contacto de emergencia', required: false })
-  @IsOptional()
-  @IsString()
-  @Length(1, 50)
-  contactoEmergenciaRelacion?: string;
+  @IsDateString()
+  cumpleanos?: string;
 
   @ApiProperty({ description: 'Estado activo del cliente', required: false })
   @IsOptional()
   @IsBoolean()
   estaActivo?: boolean;
+
+  @ApiProperty({ description: 'ID del lead asociado', required: false })
+  @IsOptional()
+  @IsString()
+  idLead?: string;
+
+  @ApiProperty({ description: 'ID del usuario asignado', example: 'uuid-del-usuario', required: false })
+  @IsOptional()
+  @IsString()
+  asignadoA?: string;
 }

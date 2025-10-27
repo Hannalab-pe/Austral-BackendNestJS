@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cliente } from '../entities/cliente.entity';
 import { CreateClienteDto, UpdateClienteDto } from '../dto';
+import { ContactosClienteService } from './contactos-cliente.service';
 
 export interface ClienteFiltros {
   estaActivo?: boolean;
@@ -28,6 +29,7 @@ export class ClientesService {
   constructor(
     @InjectRepository(Cliente)
     private readonly clienteRepository: Repository<Cliente>,
+    private readonly contactosClienteService: ContactosClienteService,
   ) { }
 
   /**
@@ -58,10 +60,10 @@ export class ClientesService {
       const searchLower = filtros.search.toLowerCase();
       return clientes.filter(
         (c) =>
-          c.nombre.toLowerCase().includes(searchLower) ||
-          c.apellido.toLowerCase().includes(searchLower) ||
-          c.email.toLowerCase().includes(searchLower) ||
-          c.documentoIdentidad.toLowerCase().includes(searchLower),
+          c.nombres?.toLowerCase().includes(searchLower) ||
+          c.apellidos?.toLowerCase().includes(searchLower) ||
+          c.emailNotificaciones?.toLowerCase().includes(searchLower) ||
+          c.numeroDocumento?.toLowerCase().includes(searchLower),
       );
     }
 
@@ -142,10 +144,10 @@ export class ClientesService {
         const searchLower = filtros.search.toLowerCase();
         return clientes.filter(
           (c) =>
-            c.nombre.toLowerCase().includes(searchLower) ||
-            c.apellido.toLowerCase().includes(searchLower) ||
-            c.email.toLowerCase().includes(searchLower) ||
-            c.documentoIdentidad.toLowerCase().includes(searchLower),
+            c.nombres?.toLowerCase().includes(searchLower) ||
+            c.apellidos?.toLowerCase().includes(searchLower) ||
+            c.emailNotificaciones?.toLowerCase().includes(searchLower) ||
+            c.numeroDocumento?.toLowerCase().includes(searchLower),
         );
       }
 
@@ -186,17 +188,19 @@ export class ClientesService {
     userSupervisorId: string | null,
   ): Promise<Cliente> {
     try {
-      // Verificar si el email ya está en uso
-      const existingEmail = await this.clienteRepository.findOne({
-        where: { email: createClienteDto.email },
-      });
-      if (existingEmail) {
-        throw new BadRequestException('El email ya está en uso');
+      // Verificar si el email ya está en uso (si se proporciona)
+      if (createClienteDto.emailNotificaciones) {
+        const existingEmail = await this.clienteRepository.findOne({
+          where: { emailNotificaciones: createClienteDto.emailNotificaciones },
+        });
+        if (existingEmail) {
+          throw new BadRequestException('El email ya está en uso');
+        }
       }
 
       // Verificar si el documento ya está en uso
       const existingDoc = await this.clienteRepository.findOne({
-        where: { documentoIdentidad: createClienteDto.documentoIdentidad },
+        where: { numeroDocumento: createClienteDto.numeroDocumento },
       });
       if (existingDoc) {
         throw new BadRequestException('El documento de identidad ya está registrado');
@@ -207,23 +211,48 @@ export class ClientesService {
         ...createClienteDto,
         registradoPor: userId,
         estaActivo: true,
+        recibirNotificaciones: createClienteDto.recibirNotificaciones ?? true,
       };
 
-      // Si es un Broker, se asigna a sí mismo como broker_asignado
-      if (userRole === 'Broker') {
-        clienteData.brokerAsignado = userId;
+      // Convertir fecha de cumpleaños si se proporciona
+      if (createClienteDto.cumpleanos) {
+        clienteData.cumpleanos = new Date(createClienteDto.cumpleanos);
       }
 
-      // Si es un Vendedor, asigna su supervisor (Broker) como broker_asignado
-      if (userRole === 'Vendedor' && userSupervisorId) {
-        clienteData.brokerAsignado = userSupervisorId;
+      // Si no se proporciona asignadoA, asignar automáticamente según el rol
+      if (!createClienteDto.asignadoA) {
+        // Si es un Broker, se asigna a sí mismo como asignadoA
+        if (userRole === 'Broker') {
+          clienteData.asignadoA = userId;
+        }
+
+        // Si es un Vendedor, asigna su supervisor (Broker) como asignadoA
+        if (userRole === 'Vendedor' && userSupervisorId) {
+          clienteData.asignadoA = userSupervisorId;
+        }
       }
 
       const cliente = this.clienteRepository.create(clienteData);
       const savedCliente = await this.clienteRepository.save(cliente);
 
       // Asegurarse de que retornamos un solo cliente, no un array
-      return Array.isArray(savedCliente) ? savedCliente[0] : savedCliente;
+      const clienteCreado = Array.isArray(savedCliente) ? savedCliente[0] : savedCliente;
+
+      // Crear contactos adicionales si se proporcionaron
+      if (createClienteDto.contactos && createClienteDto.contactos.length > 0) {
+        console.log(`Creando ${createClienteDto.contactos.length} contactos para el cliente ${clienteCreado.idCliente}`);
+        await Promise.all(
+          createClienteDto.contactos.map(contacto =>
+            this.contactosClienteService.create({
+              ...contacto,
+              idCliente: clienteCreado.idCliente,
+            })
+          )
+        );
+        console.log('Contactos creados exitosamente');
+      }
+
+      return clienteCreado;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -242,9 +271,9 @@ export class ClientesService {
     const cliente = await this.findOne(id);
 
     // Verificar si el email ya está en uso por otro cliente
-    if (updateClienteDto.email && updateClienteDto.email !== cliente.email) {
+    if (updateClienteDto.emailNotificaciones && updateClienteDto.emailNotificaciones !== cliente.emailNotificaciones) {
       const existingEmail = await this.clienteRepository.findOne({
-        where: { email: updateClienteDto.email },
+        where: { emailNotificaciones: updateClienteDto.emailNotificaciones },
       });
 
       if (existingEmail && existingEmail.idCliente !== id) {
@@ -253,9 +282,9 @@ export class ClientesService {
     }
 
     // Verificar si el documento ya está en uso por otro cliente
-    if (updateClienteDto.documentoIdentidad && updateClienteDto.documentoIdentidad !== cliente.documentoIdentidad) {
+    if (updateClienteDto.numeroDocumento && updateClienteDto.numeroDocumento !== cliente.numeroDocumento) {
       const existingDoc = await this.clienteRepository.findOne({
-        where: { documentoIdentidad: updateClienteDto.documentoIdentidad },
+        where: { numeroDocumento: updateClienteDto.numeroDocumento },
       });
 
       if (existingDoc && existingDoc.idCliente !== id) {
@@ -264,6 +293,12 @@ export class ClientesService {
     }
 
     Object.assign(cliente, updateClienteDto);
+
+    // Convertir fecha de cumpleaños si se proporciona
+    if (updateClienteDto.cumpleanos) {
+      cliente.cumpleanos = new Date(updateClienteDto.cumpleanos);
+    }
+
     return await this.clienteRepository.save(cliente);
   }
 
@@ -293,7 +328,7 @@ export class ClientesService {
     documentoIdentidad: string,
   ): Promise<Cliente | null> {
     return await this.clienteRepository.findOne({
-      where: { tipoDocumento, documentoIdentidad },
+      where: { tipoDocumento, numeroDocumento: documentoIdentidad },
     });
   }
 
@@ -302,7 +337,7 @@ export class ClientesService {
    */
   async findByBroker(brokerId: string): Promise<Cliente[]> {
     return await this.clienteRepository.find({
-      where: { brokerAsignado: brokerId, estaActivo: true },
+      where: { asignadoA: brokerId, estaActivo: true },
       order: { fechaRegistro: 'DESC' },
     });
   }

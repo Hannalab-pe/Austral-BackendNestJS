@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ClientesController, ContactosClienteController } from './controllers';
 import { ClientesService, ContactosClienteService } from './services';
-import { Cliente, ContactoCliente, Beneficiario } from './entities';
+import { Cliente, ClienteContacto, ClienteDocumento, Beneficiario } from './entities';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
@@ -22,13 +22,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'austral_seguros'),
-        entities: [Cliente, ContactoCliente, Beneficiario],
+        entities: [Cliente, ClienteContacto, ClienteDocumento, Beneficiario],
         synchronize: false, // NO modificar la BD existente
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Cliente, ContactoCliente, Beneficiario]),
+    TypeOrmModule.forFeature([Cliente, ClienteContacto, ClienteDocumento, Beneficiario]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],

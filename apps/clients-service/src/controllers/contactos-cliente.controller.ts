@@ -14,7 +14,7 @@ import { CreateContactoClienteDto, UpdateContactoClienteDto } from '../dto';
 
 @Controller('contactos-cliente')
 export class ContactosClienteController {
-  constructor(private readonly contactosService: ContactosClienteService) {}
+  constructor(private readonly contactosService: ContactosClienteService) { }
 
   @Get()
   async findAll(
@@ -25,17 +25,12 @@ export class ContactosClienteController {
   }
 
   @Get('cliente/:clienteId')
-  async findByCliente(@Param('clienteId', ParseIntPipe) clienteId: number) {
+  async findByCliente(@Param('clienteId') clienteId: string) {
     return await this.contactosService.findByCliente(clienteId);
   }
 
-  @Get('tipo/:tipo')
-  async findByTipo(@Param('tipo') tipo: string) {
-    return await this.contactosService.findByTipo(tipo);
-  }
-
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id') id: string) {
     return await this.contactosService.findOne(id);
   }
 
@@ -46,14 +41,14 @@ export class ContactosClienteController {
 
   @Patch(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateContactoDto: UpdateContactoClienteDto,
   ) {
     return await this.contactosService.update(id, updateContactoDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: string) {
     return await this.contactosService.remove(id);
   }
 }
