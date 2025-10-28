@@ -169,6 +169,7 @@ export class ClientesService {
   async findOne(id: string): Promise<Cliente> {
     const cliente = await this.clienteRepository.findOne({
       where: { idCliente: id },
+      relations: ['contactos'],
     });
 
     if (!cliente) {
