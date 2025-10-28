@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(psql:*)",
+      "Bash(npm run build:*)",
+      "Bash(Select-String -Pattern \"ERROR|error\" -Context 2,2)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 10 pnpm run start:dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

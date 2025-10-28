@@ -199,12 +199,45 @@ export class AuthServiceService {
       throw new BadRequestException('Contraseña actual incorrecta');
     }
 
+    // Validar seguridad de la nueva contraseña
+    this.validatePasswordSecurity(contrasenaNueva);
+
     const hashedPassword = await bcrypt.hash(contrasenaNueva, 12);
     user.contrasena = hashedPassword;
 
     await this.usuarioRepository.save(user);
 
     return { message: 'Contraseña actualizada exitosamente' };
+  }
+
+  private validatePasswordSecurity(password: string): void {
+    // Validar longitud mínima de 8 caracteres
+    if (password.length < 8) {
+      throw new BadRequestException(
+        'La contraseña debe tener al menos 8 caracteres',
+      );
+    }
+
+    // Validar al menos una letra mayúscula
+    if (!/[A-Z]/.test(password)) {
+      throw new BadRequestException(
+        'La contraseña debe contener al menos una letra mayúscula',
+      );
+    }
+
+    // Validar al menos una letra minúscula
+    if (!/[a-z]/.test(password)) {
+      throw new BadRequestException(
+        'La contraseña debe contener al menos una letra minúscula',
+      );
+    }
+
+    // Validar al menos un número
+    if (!/[0-9]/.test(password)) {
+      throw new BadRequestException(
+        'La contraseña debe contener al menos un número',
+      );
+    }
   }
 
   async getUserProfile(userId: string) {

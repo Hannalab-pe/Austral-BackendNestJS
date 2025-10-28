@@ -19,7 +19,7 @@ export class DetalleSeguroSctrService {
   ): Promise<DetalleSeguroSctr> {
     // Verificar que el lead existe y está activo
     const lead = await this.leadRepository.findOne({
-      where: { id_lead: createDto.lead_id, esta_activo: true },
+      where: { idLead: createDto.lead_id, esta_activo: true },
     });
 
     if (!lead) {

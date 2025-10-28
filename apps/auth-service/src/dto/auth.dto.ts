@@ -133,12 +133,12 @@ export class ChangePasswordDto {
   contrasenaActual: string;
 
   @ApiProperty({
-    description: 'Nueva contraseña',
-    example: 'newpassword123',
-    minLength: 6,
+    description: 'Nueva contraseña - Debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número',
+    example: 'NewPassword123',
+    minLength: 8,
   })
   @IsNotEmpty()
   @IsString()
-  @Length(6, 255)
+  @Length(8, 255)
   contrasenaNueva: string;
 }

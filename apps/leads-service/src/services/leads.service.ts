@@ -58,7 +58,7 @@ export class LeadsService {
 
   async update(id: string, updateData: Partial<Lead>): Promise<Lead> {
     const lead = await this.leadRepository.findOne({
-      where: { id_lead: id, esta_activo: true },
+      where: { idLead: id, esta_activo: true },
     });
 
     if (!lead) {
@@ -95,7 +95,7 @@ export class LeadsService {
 
   async updateStatus(id: string, idEstado: string): Promise<Lead> {
     const lead = await this.leadRepository.findOne({
-      where: { id_lead: id, esta_activo: true },
+      where: { idLead: id, esta_activo: true },
     });
 
     if (!lead) {

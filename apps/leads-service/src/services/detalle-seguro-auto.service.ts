@@ -19,7 +19,7 @@ export class DetalleSeguroAutoService {
   async create(createDto: CreateDetalleSeguroAutoDto): Promise<DetalleSeguroAutoResponseDto> {
     // Verificar que el lead existe
     const lead = await this.leadRepository.findOne({
-      where: { id_lead: createDto.lead_id },
+      where: { idLead: createDto.lead_id },
     });
 
     if (!lead) {
@@ -119,7 +119,7 @@ export class DetalleSeguroAutoService {
 
     if (detalle.lead) {
       response.lead = {
-        id_lead: detalle.lead.id_lead,
+        id_lead: detalle.lead.idLead,
         nombre: detalle.lead.nombre,
         apellido: detalle.lead.apellido,
         telefono: detalle.lead.telefono,
