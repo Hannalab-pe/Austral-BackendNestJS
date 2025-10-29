@@ -26,12 +26,24 @@ async function bootstrap() {
   // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle('Leads Service API')
-    .setDescription('API para gestión de leads, estados y fuentes')
+    .setDescription(
+      'API REST para la gestión completa de leads de seguros, ' +
+      'incluyendo estados, fuentes, cotizaciones y detalles de seguros específicos (auto, salud, SCTR). ' +
+      'Permite crear, consultar y actualizar leads, así como calcular cotizaciones personalizadas.'
+    )
     .setVersion('1.0')
-    .addTag('Leads')
-    .addTag('Estados de Lead')
-    .addTag('Fuentes de Lead')
-    .addTag('Detalle Seguro Auto')
+    .setContact(
+      'Equipo de Desarrollo',
+      'https://austral.pe',
+      'soporte@austral.pe'
+    )
+    .addTag('Leads', 'Gestión de leads - creación, consulta y actualización')
+    .addTag('Estados de Lead', 'Administración de estados del proceso de leads')
+    .addTag('Fuentes de Lead', 'Gestión de fuentes de origen de leads')
+    .addTag('Cotizaciones', 'Cálculo de cotizaciones para seguros de auto, salud y SCTR')
+    .addTag('Detalle Seguro Auto', 'Información detallada de seguros vehiculares')
+    .addTag('Detalle Seguro Salud', 'Información detallada de seguros de salud')
+    .addTag('Detalle Seguro SCTR', 'Información detallada de seguros SCTR')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Patch, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { LeadsService } from '../services/leads.service';
-import { CreateLeadDto } from '../dto/leads.dto';
+import { CreateLeadDto, UpdateLeadDto } from '../dto/leads.dto';
 
 @ApiTags('Leads')
 @Controller('leads')
@@ -97,7 +97,17 @@ export class LeadsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar un lead existente' })
+  @ApiOperation({
+    summary: 'Actualizar un lead existente',
+    description: 'Permite actualizar parcialmente la información de un lead. Solo se actualizarán los campos proporcionados.'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'UUID del lead a actualizar',
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  })
+  @ApiBody({ type: UpdateLeadDto })
   @ApiResponse({
     status: 200,
     description: 'Lead actualizado exitosamente',
@@ -110,12 +120,50 @@ export class LeadsController {
     status: 400,
     description: 'Datos inválidos',
   })
-  async update(@Param('id') id: string, @Body() updateData: any) {
-    return this.leadsService.update(id, updateData);
+  async update(@Param('id') id: string, @Body() updateData: UpdateLeadDto) {
+    // Convertir las fechas del DTO a objetos Date si es necesario
+    const updatePayload: any = { ...updateData };
+
+    if (updateData.fecha_nacimiento) {
+      updatePayload.fecha_nacimiento = new Date(updateData.fecha_nacimiento);
+    }
+
+    if (updateData.proxima_fecha_seguimiento) {
+      updatePayload.proxima_fecha_seguimiento = new Date(updateData.proxima_fecha_seguimiento);
+    }
+
+    if (updateData.fecha_ultimo_contacto) {
+      updatePayload.fecha_ultimo_contacto = new Date(updateData.fecha_ultimo_contacto);
+    }
+
+    return this.leadsService.update(id, updatePayload);
   }
 
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Actualizar el estado de un lead' })
+  @ApiOperation({
+    summary: 'Actualizar el estado de un lead',
+    description: 'Cambia el estado del lead en el proceso de ventas (ej: Nuevo → Contactado → Calificado → Convertido)'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'UUID del lead',
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id_estado: {
+          type: 'string',
+          format: 'uuid',
+          description: 'UUID del nuevo estado',
+          example: '123e4567-e89b-12d3-a456-426614174001'
+        }
+      },
+      required: ['id_estado']
+    }
+  })
   @ApiResponse({
     status: 200,
     description: 'Estado del lead actualizado exitosamente',

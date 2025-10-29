@@ -44,7 +44,8 @@ import { CotizacionesService } from './services/cotizaciones.service';
           DetalleSeguroSalud,
           DetalleSeguroSctr,
         ],
-        synchronize: true, // Temporalmente true para crear tablas
+        synchronize: false, // Cambiado a false para evitar problemas con índices duplicados
+        logging: ['error', 'warn'], // Solo mostrar errores y warnings
       }),
     }),
     TypeOrmModule.forFeature([
