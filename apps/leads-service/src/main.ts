@@ -6,9 +6,20 @@ import { LeadsServiceModule } from './leads-service.module';
 async function bootstrap() {
   const app = await NestFactory.create(LeadsServiceModule);
 
-  // Configurar CORS
+  // Configurar CORS - Permitir todos los orígenes en producción
+  const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? ['https://austral-backendnestjs-production.up.railway.app', 'https://tu-frontend.com'] // Agrega tu frontend aquí
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Permitir requests sin origin (como Postman) o origins en la lista
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true,
@@ -50,8 +61,17 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const port = process.env.PORT ?? 3002;
-  await app.listen(port);
-  console.log(`Leads Service running on: http://localhost:${port}`);
-  console.log(`Swagger documentation: http://localhost:${port}/api`);
+  await app.listen(port, '0.0.0.0'); // Escuchar en todas las interfaces
+
+  const environment = process.env.NODE_ENV || 'development';
+  console.log(`Environment: ${environment}`);
+  console.log(`Leads Service running on port: ${port}`);
+  if (environment === 'development') {
+    console.log(`Local URL: http://localhost:${port}`);
+    console.log(`Swagger documentation: http://localhost:${port}/api`);
+  } else {
+    console.log(`Production URL: https://austral-backendnestjs-production.up.railway.app`);
+    console.log(`Swagger documentation: https://austral-backendnestjs-production.up.railway.app/api`);
+  }
 }
 bootstrap();
