@@ -3,8 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ClientesController, ContactosClienteController } from './controllers';
-import { ClientesService, ContactosClienteService } from './services';
+import { MulterModule } from '@nestjs/platform-express';
+import { ClientesController, ContactosClienteController, DocumentsController } from './controllers';
+import { ClientesService, ContactosClienteService, DocumentsService } from './services';
 import { Cliente, ClienteContacto, ClienteDocumento, Beneficiario } from './entities';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -39,9 +40,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         },
       }),
     }),
+    MulterModule.register({
+      dest: './uploads', // Directorio temporal para archivos subidos
+    }),
   ],
-  controllers: [ClientesController, ContactosClienteController],
-  providers: [ClientesService, ContactosClienteService, JwtStrategy],
-  exports: [ClientesService, ContactosClienteService],
+  controllers: [ClientesController, ContactosClienteController, DocumentsController],
+  providers: [ClientesService, ContactosClienteService, DocumentsService, JwtStrategy],
+  exports: [ClientesService, ContactosClienteService, DocumentsService],
 })
 export class ClientsServiceModule { }

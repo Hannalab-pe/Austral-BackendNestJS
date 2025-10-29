@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ClientsServiceModule } from './clients-service.module';
 
 async function bootstrap() {
@@ -22,8 +23,20 @@ async function bootstrap() {
     }),
   );
 
+  // Configuración Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Auth Service API')
+    .setDescription('API de autenticación y autorización')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   const port = process.env.PORT ?? 3003;
   await app.listen(port);
-  console.log(`🚀 Clients Service running on port ${port}`);
+
+  console.log(`🔐 Auth Service ejecutándose en puerto ${port}`);
+  console.log(`📚 Swagger UI disponible en: http://localhost:${port}/api`);
 }
 bootstrap();
