@@ -1,5 +1,4 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import * as XLSX from 'xlsx';
 import { ClientesService } from './clientes.service';
 
 export interface BulkUploadResult {
@@ -16,10 +15,14 @@ export class DocumentsService {
     constructor(private readonly clientesService: ClientesService) { }
 
     /**
-     * Genera una plantilla Excel para la subida masiva de clientes
+     * Genera una plantilla Excel para la subida masiva de clientes usando exceljs para aplicar estilos
      */
     async generateTemplate(): Promise<Buffer> {
-        // Definir las columnas de la plantilla
+        const ExcelJS = await import('exceljs');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Plantilla_Clientes');
+
+        // Definir encabezados y ejemplo
         const headers = [
             'Tipo de persona',
             'Tipo de documento',
@@ -38,69 +41,54 @@ export class DocumentsService {
             'Provincia',
             'Departamento'
         ];
-
-        // Crear datos de ejemplo
         const exampleData = [
             ['NATURAL', 'DNI', '12345678', 'Juan', 'Pérez', '', '987654321', 'juan.perez@email.com', '1990-05-15', '987654322', '987654323', 'juan.perez@gmail.com', 'Av. Principal 123', 'Lima', 'Lima', 'Lima'],
             ['JURIDICO', 'RUC', '20123456789', '', '', 'Empresa S.A.', '987654322', 'contacto@empresa.com', '', '', '', 'contacto2@empresa.com', 'Jr. Comercio 456', 'Miraflores', 'Lima', 'Lima']
         ];
 
-        // Crear workbook y worksheet
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...exampleData]);
+        // Agregar encabezados
+        worksheet.addRow(headers);
+        // Agregar ejemplos
+        exampleData.forEach(row => worksheet.addRow(row));
 
-        // Establecer ancho de columnas
-        ws['!cols'] = [
-            { wch: 15 }, // Tipo de persona
-            { wch: 20 }, // Tipo de documento
-            { wch: 20 }, // Numero de documento
-            { wch: 20 }, // Nombre
-            { wch: 20 }, // Apellido
-            { wch: 25 }, // Razon Social
-            { wch: 15 }, // Telefono 1
-            { wch: 30 }, // Correo
-            { wch: 15 }, // Cumpleaños
-            { wch: 15 }, // Telefono 2
-            { wch: 15 }, // WhatsApp
-            { wch: 30 }, // Email
-            { wch: 30 }, // Direccion
-            { wch: 20 }, // Distrito
-            { wch: 20 }, // Provincia
-            { wch: 20 }  // Departamento
-        ];
+        // Definir estilos de columnas
+        const requiredColumns = [1, 2, 3, 4, 5, 6, 7, 8]; // 1-based para exceljs
+        const optionalColumns = [9, 10, 11, 12, 13, 14, 15, 16];
 
-        // Aplicar estilos a los encabezados
-        // Campos obligatorios (fondo azul, texto blanco): columnas 0-7
-        // Campos opcionales (fondo blanco, texto negro): columnas 8-15
-        const requiredColumns = [0, 1, 2, 3, 4, 5, 6, 7]; // Índices de columnas obligatorias
-        const optionalColumns = [8, 9, 10, 11, 12, 13, 14, 15]; // Índices de columnas opcionales
-
-        // Aplicar estilo a encabezados obligatorios (fondo azul, texto blanco)
-        requiredColumns.forEach(col => {
-            const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
-            if (!ws[cellRef]) ws[cellRef] = { t: 's', v: headers[col] };
-            ws[cellRef].s = {
-                fill: { fgColor: { rgb: "FF0066CC" } }, // Azul
-                font: { color: { rgb: "FFFFFFFF" } }, // Blanco
-                alignment: { horizontal: "center", vertical: "center" }
-            };
+        // Anchos de columna
+        const colWidths = [15, 20, 20, 20, 20, 25, 15, 30, 15, 15, 15, 30, 30, 20, 20, 20];
+        worksheet.columns.forEach((col, idx) => {
+            col.width = colWidths[idx] || 20;
         });
 
-        // Aplicar estilo a encabezados opcionales (fondo blanco, texto negro)
-        optionalColumns.forEach(col => {
-            const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
-            if (!ws[cellRef]) ws[cellRef] = { t: 's', v: headers[col] };
-            ws[cellRef].s = {
-                fill: { fgColor: { rgb: "FFFFFFFF" } }, // Blanco
-                font: { color: { rgb: "FF000000" } }, // Negro
-                alignment: { horizontal: "center", vertical: "center" }
-            };
+        // Estilos de encabezado
+        headers.forEach((header, idx) => {
+            const cell = worksheet.getRow(1).getCell(idx + 1);
+            if (requiredColumns.includes(idx + 1)) {
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF0066CC' }
+                };
+                cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+            } else {
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFFFFFF' }
+                };
+                cell.font = { color: { argb: 'FF000000' } };
+            }
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
         });
 
-        XLSX.utils.book_append_sheet(wb, ws, 'Plantilla_Clientes');
+        // Ajustar altura de encabezado
+        worksheet.getRow(1).height = 22;
 
-        // Convertir a buffer
-        return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        // Exportar a buffer
+        const arrayBuffer = await workbook.xlsx.writeBuffer();
+        // Convertir ArrayBuffer a Buffer de Node.js
+        return Buffer.from(arrayBuffer);
     }
 
     /**
@@ -112,52 +100,92 @@ export class DocumentsService {
         userRole: string,
         userSupervisorId: string | null
     ): Promise<BulkUploadResult> {
+        const ExcelJS = await import('exceljs');
         try {
-            // Leer el archivo Excel
-            const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
+            // Logs de depuración del archivo recibido
+            console.log('=== DEPURACIÓN ARCHIVO RECIBIDO ===');
+            console.log('Nombre original:', file.originalname);
+            console.log('Mimetype:', file.mimetype);
+            console.log('Tamaño:', file.size);
+            console.log('Tipo de buffer:', typeof file.buffer);
+            console.log('Buffer es Buffer?', Buffer.isBuffer(file.buffer));
+            console.log('Longitud del buffer:', file.buffer?.length);
+            console.log('Primeros 10 bytes del buffer:', file.buffer?.slice(0, 10)?.toString('hex'));
+            console.log('=====================================');
 
-            // Convertir a JSON
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
-
-            if (jsonData.length < 2) {
-                throw new BadRequestException('El archivo debe contener al menos los encabezados y una fila de datos');
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(file.buffer as any);
+            const worksheet = workbook.worksheets[0];
+            if (!worksheet) {
+                console.error('No se encontró ninguna hoja en el archivo Excel');
+                throw new BadRequestException('No se encontró ninguna hoja en el archivo Excel');
             }
-
-            // Remover fila de encabezados
-            jsonData.shift();
 
             const result: BulkUploadResult = {
                 success: 0,
                 errors: [],
-                total: jsonData.length
+                total: 0
             };
 
-            // Procesar cada fila
-            for (let i = 0; i < jsonData.length; i++) {
-                const row = jsonData[i];
-                const rowNumber = i + 2; // +2 porque Excel empieza en 1 y ya removimos headers
+            let isFirstRow = true; // Para saltar el encabezado
+            const createPromises: Promise<void>[] = [];
+
+            worksheet.eachRow((row, rowNumber) => {
+                if (isFirstRow) {
+                    isFirstRow = false;
+                    return; // Saltar encabezado
+                }
+
+                const values = Array.isArray(row.values) ? row.values.slice(1) : [];
+                // console.log(`Fila ${rowNumber}:`, values); // Comentado para producción
+
+                // Función auxiliar para extraer el valor real de una celda
+                const getCellValue = (cell: any): string => {
+                    if (cell === undefined || cell === null) return '';
+                    if (typeof cell === 'object' && cell.text !== undefined) {
+                        // Manejar celdas con hipervínculos
+                        return String(cell.text).trim();
+                    }
+                    return String(cell).trim();
+                };
+
+                if (values.length === 0 || values.every(v => getCellValue(v) === '')) {
+                    console.log(`Fila ${rowNumber} vacía, se omite.`);
+                    return;
+                }
+
+                result.total++;
+                const rowNumberForError = rowNumber;
 
                 try {
-                    // Validar y mapear datos
-                    const clienteData = this.validateAndMapRow(row, rowNumber);
-
-                    // Intentar crear el cliente
-                    await this.clientesService.create(clienteData, userId, userRole, userSupervisorId);
-                    result.success++;
-
+                    const clienteData = this.validateAndMapRow(values.map(getCellValue), rowNumberForError);
+                    const createPromise = this.clientesService.create(clienteData, userId, userRole, userSupervisorId)
+                        .then(() => {
+                            result.success++;
+                        })
+                        .catch(error => {
+                            console.error(`Error creando cliente en fila ${rowNumberForError}:`, error.message);
+                            result.errors.push({
+                                row: rowNumberForError,
+                                error: error.message || 'Error desconocido'
+                            });
+                        });
+                    createPromises.push(createPromise);
                 } catch (error) {
+                    console.error(`Error validando fila ${rowNumberForError}:`, error.message);
                     result.errors.push({
-                        row: rowNumber,
+                        row: rowNumberForError,
                         error: error.message || 'Error desconocido'
                     });
                 }
-            }
+            });
 
+            await Promise.all(createPromises);
+
+            console.log('Resultado final subida masiva:', result);
             return result;
-
         } catch (error) {
+            console.error('Error global al procesar el archivo Excel:', error.message);
             if (error instanceof BadRequestException) {
                 throw error;
             }

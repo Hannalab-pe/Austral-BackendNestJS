@@ -18,6 +18,7 @@ import {
     ApiBody,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage, memoryStorage } from 'multer';
 import { Response as Res } from 'express';
 import { DocumentsService, BulkUploadResult } from '../services/documents.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -122,18 +123,25 @@ export class DocumentsController {
         status: 400,
         description: 'Error en el procesamiento del archivo',
     })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+        limits: {
+            fileSize: 10 * 1024 * 1024, // 10MB límite
+        },
+        fileFilter: (req, file, callback) => {
+            // Validar tipo de archivo
+            if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+                return callback(new BadRequestException('Solo se permiten archivos Excel (.xlsx o .xls)'), false);
+            }
+            callback(null, true);
+        },
+    }))
     async bulkUpload(
         @UploadedFile() file: Express.Multer.File,
         @Request() req: any,
     ): Promise<BulkUploadResult> {
         if (!file) {
             throw new BadRequestException('No se proporcionó ningún archivo');
-        }
-
-        // Validar tipo de archivo
-        if (!file.originalname.endsWith('.xlsx') && !file.originalname.endsWith('.xls')) {
-            throw new BadRequestException('El archivo debe ser un Excel (.xlsx o .xls)');
         }
 
         // Obtener información del usuario autenticado
