@@ -18,7 +18,15 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill /F /PID 26652)",
-      "Bash(cmd.exe /c \"taskkill /F /PID 26652\")"
+      "Bash(cmd.exe /c \"taskkill /F /PID 26652\")",
+      "Bash(powershell -Command \"$env:PGPASSWORD=''postgres''; psql -h localhost -p 5432 -U postgres -d railway -c ''\\d detalle_seguro_auto'' 2>&1\")",
+      "Bash(powershell -Command \"$env:PGPASSWORD=''postgres''; psql -h localhost -p 5432 -U postgres -d railway -f ''c:/Users/Usuario/Desktop/Austral-BackendNestJS/apps/leads-service/src/scripts/add-placa-column.sql'' 2>&1\")",
+      "Bash($env:PGPASSWORD='postgres')",
+      "Bash(cmd.exe /c \"c:\\Users\\Usuario\\Desktop\\Austral-BackendNestJS\\apps\\leads-service\\src\\scripts\\add-placa.bat\")",
+      "Bash(setx PGPASSWORD \"postgres\")",
+      "Bash(cmd.exe /c \"c:\\Users\\Usuario\\Desktop\\Austral-BackendNestJS\\apps\\leads-service\\src\\scripts\\add-placa-railway.bat\")",
+      "Bash(cmd.exe /c \"c:\\Users\\Usuario\\Desktop\\Austral-BackendNestJS\\apps\\leads-service\\src\\scripts\\verify-placa.bat\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"$env:PGPASSWORD=''EnvdCBYGtIEPHgESTmLyCMScRODJRhSN''; psql -h hopper.proxy.rlwy.net -p 49151 -U postgres -d railway -c ''ALTER TABLE detalle_seguro_auto ADD COLUMN IF NOT EXISTS placa VARCHAR(20);'' 2>&1; psql -h hopper.proxy.rlwy.net -p 49151 -U postgres -d railway -c ''\\d detalle_seguro_auto'' 2>&1\")"
     ],
     "deny": [],
     "ask": []

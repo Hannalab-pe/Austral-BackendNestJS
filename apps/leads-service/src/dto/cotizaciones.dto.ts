@@ -38,7 +38,8 @@ export class CalcularCotizacionAutoDto {
   anio: number;
 
   @ApiProperty({
-    description: 'Valor del vehículo (opcional, si no se proporciona se usa valor referencial)',
+    description:
+      'Valor del vehículo (opcional, si no se proporciona se usa valor referencial)',
     example: 15000,
     required: false,
   })
@@ -172,7 +173,8 @@ export class CalcularCotizacionSctrDto {
   codigo_actividad: string;
 
   @ApiProperty({
-    description: 'Indica si se realizó evaluación de riesgo para actividades de alto riesgo',
+    description:
+      'Indica si se realizó evaluación de riesgo para actividades de alto riesgo',
     example: true,
     required: false,
   })

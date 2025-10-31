@@ -1,61 +1,145 @@
-import { IsString, IsInt, IsUUID, Min, Max } from 'class-validator';
+import { IsString, IsInt, IsUUID, Min, Max, IsOptional, IsBoolean, IsNumber, IsIn } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateDetalleSeguroAutoDto {
   @IsUUID()
-  lead_id: string;
+  id_lead: string;
 
   @IsString()
-  marca_auto: string;
+  marca: string;
+
+  @IsString()
+  modelo: string;
 
   @IsInt()
   @Min(1900)
-  @Max(new Date().getFullYear() + 1)
-  ano_auto: number;
+  @Max(2100)
+  anio: number;
 
+  @IsOptional()
   @IsString()
-  modelo_auto: string;
+  placa?: string;
 
-  @IsString()
-  placa_auto: string;
+  @IsOptional()
+  @IsNumber()
+  valor_vehiculo?: number;
 
+  @IsOptional()
   @IsString()
-  tipo_uso: string;
+  @IsIn(['Terceros', 'Terceros completo', 'Todo riesgo'])
+  tipo_cobertura?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['Baja', 'Media', 'Alta'])
+  zona_riesgo?: string;
+
+  @IsOptional()
+  @IsInt()
+  antiguedad_licencia?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  tiene_gps?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  tiene_alarma?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  numero_siniestros_previos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  esta_financiado?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['Particular', 'Comercial', 'Uber/Taxi', 'Otro'])
+  uso_vehiculo?: string;
 }
 
 export class UpdateDetalleSeguroAutoDto {
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  marca_auto?: string;
+  marca?: string;
 
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => value?.trim())
+  modelo?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(1900)
-  @Max(new Date().getFullYear() + 1)
-  ano_auto?: number;
+  @Max(2100)
+  anio?: number;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  modelo_auto?: string;
+  placa?: string;
 
-  @IsString()
-  @Transform(({ value }) => value?.trim())
-  placa_auto?: string;
+  @IsOptional()
+  @IsNumber()
+  valor_vehiculo?: number;
 
+  @IsOptional()
   @IsString()
-  @Transform(({ value }) => value?.trim())
-  tipo_uso?: string;
+  @IsIn(['Terceros', 'Terceros completo', 'Todo riesgo'])
+  tipo_cobertura?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['Baja', 'Media', 'Alta'])
+  zona_riesgo?: string;
+
+  @IsOptional()
+  @IsInt()
+  antiguedad_licencia?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  tiene_gps?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  tiene_alarma?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  numero_siniestros_previos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  esta_financiado?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['Particular', 'Comercial', 'Uber/Taxi', 'Otro'])
+  uso_vehiculo?: string;
 }
 
 export class DetalleSeguroAutoResponseDto {
-  id: string;
-  lead_id: string;
-  marca_auto: string;
-  ano_auto: number;
-  modelo_auto: string;
-  placa_auto: string;
-  tipo_uso: string;
+  id_detalle_auto: string;
+  id_lead: string;
+  marca: string;
+  modelo: string;
+  anio: number;
+  placa?: string;
+  valor_vehiculo?: number;
+  tipo_cobertura?: string;
+  zona_riesgo: string;
+  antiguedad_licencia?: number;
+  tiene_gps: boolean;
+  tiene_alarma: boolean;
+  numero_siniestros_previos: number;
+  esta_financiado: boolean;
+  uso_vehiculo?: string;
+  esta_activo: boolean;
   fecha_creacion: Date;
-  fecha_actualizacion: Date;
 
   // Información del lead relacionada
   lead?: {
