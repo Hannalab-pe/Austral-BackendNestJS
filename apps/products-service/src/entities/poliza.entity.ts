@@ -5,11 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
 import { ProductoSeguro } from './producto-seguro.entity';
 import { CompaniaSeguro } from './compania-seguro.entity';
+import { Prima } from './prima.entity';
+import { Siniestro } from './siniestro.entity';
 
 @Entity('poliza')
 @Index('idx_poliza_cliente', ['idCliente'])
@@ -98,4 +101,11 @@ export class Poliza {
   @ManyToOne(() => ProductoSeguro)
   @JoinColumn({ name: 'id_producto' })
   producto: ProductoSeguro;
+
+  // Relaciones con primas y siniestros
+  @OneToMany(() => Prima, (prima) => prima.poliza)
+  primas: Prima[];
+
+  @OneToMany(() => Siniestro, (siniestro) => siniestro.poliza)
+  siniestros: Siniestro[];
 }

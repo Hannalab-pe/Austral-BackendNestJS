@@ -1,3 +1,35 @@
+-- Tabla de primas
+CREATE TABLE prima (
+	id_prima uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	id_poliza uuid NOT NULL,
+	monto numeric(12,2) NOT NULL,
+	fecha_vencimiento date NOT NULL,
+	fecha_pago date NULL,
+	estado varchar(20) DEFAULT 'PENDIENTE', -- PENDIENTE, PAGADA, VENCIDA
+	observaciones text NULL,
+	fecha_creacion timestamp DEFAULT now() NULL,
+	CONSTRAINT prima_id_poliza_fkey FOREIGN KEY (id_poliza) REFERENCES poliza(id_poliza) ON DELETE CASCADE
+);
+CREATE INDEX idx_prima_poliza ON prima(id_poliza);
+CREATE INDEX idx_prima_estado ON prima(estado);
+
+-- Tabla de siniestros
+CREATE TABLE siniestro (
+	id_siniestro uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	id_poliza uuid NOT NULL,
+	numero_siniestro varchar(50) NOT NULL,
+	fecha_ocurrencia date NOT NULL,
+	descripcion text NOT NULL,
+	monto_reclamado numeric(12,2) NOT NULL,
+	monto_pagado numeric(12,2) NULL,
+	estado varchar(20) DEFAULT 'REPORTADO', -- REPORTADO, EN_PROCESO, CERRADO, RECHAZADO
+	observaciones text NULL,
+	fecha_reporte timestamp DEFAULT now() NULL,
+	fecha_cierre timestamp NULL,
+	CONSTRAINT siniestro_id_poliza_fkey FOREIGN KEY (id_poliza) REFERENCES poliza(id_poliza) ON DELETE CASCADE
+);
+CREATE INDEX idx_siniestro_poliza ON siniestro(id_poliza);
+CREATE INDEX idx_siniestro_estado ON siniestro(estado);
 -- rol definition
 
 -- Drop table
