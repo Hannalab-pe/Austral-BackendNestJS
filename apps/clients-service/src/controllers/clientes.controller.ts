@@ -165,6 +165,22 @@ export class ClientesController {
     return this.clientesService.getStats();
   }
 
+  @Get('cumpleanos-proximos')
+  @ApiOperation({
+    summary: 'Obtener cumpleaños próximos',
+    description: 'Retorna lista de clientes con cumpleaños próximos en los próximos días',
+  })
+  @ApiQuery({ name: 'dias', required: false, type: Number, example: 30 })
+  @ApiResponse({
+    status: 200,
+    description: 'Cumpleaños próximos obtenidos exitosamente',
+  })
+  async getCumpleanosProximos(
+    @Query('dias', new DefaultValuePipe(30), ParseIntPipe) dias: number,
+  ): Promise<Cliente[]> {
+    return this.clientesService.getCumpleanosProximos(dias);
+  }
+
   @Get('broker/:brokerId')
   @ApiOperation({
     summary: 'Obtener clientes por broker',

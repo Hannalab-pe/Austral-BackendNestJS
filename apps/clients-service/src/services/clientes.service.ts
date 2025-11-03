@@ -362,4 +362,53 @@ export class ClientesService {
       inactivos: total - activos,
     };
   }
+
+  /**
+   * Obtiene cumpleaños próximos en los próximos días
+   */
+  async getCumpleanosProximos(dias: number = 30): Promise<Cliente[]> {
+    const hoy = new Date();
+    const fechaLimite = new Date();
+    fechaLimite.setDate(hoy.getDate() + dias);
+
+    // Query para cumpleaños en el rango actual
+    const clientes = await this.clienteRepository
+      .createQueryBuilder('cliente')
+      .where('cliente.cumpleanos IS NOT NULL')
+      .andWhere('cliente.estaActivo = :activo', { activo: true })
+      .getMany();
+
+    // Filtrar cumpleaños próximos considerando el año actual
+    const cumpleanosProximos = clientes.filter(cliente => {
+      if (!cliente.cumpleanos) return false;
+
+      const cumpleanos = new Date(cliente.cumpleanos);
+      const cumpleanosEsteAnio = new Date(hoy.getFullYear(), cumpleanos.getMonth(), cumpleanos.getDate());
+
+      // Si ya pasó este año, considerar el próximo año
+      if (cumpleanosEsteAnio < hoy) {
+        cumpleanosEsteAnio.setFullYear(hoy.getFullYear() + 1);
+      }
+
+      return cumpleanosEsteAnio <= fechaLimite;
+    });
+
+    // Ordenar por fecha de cumpleaños más próxima
+    return cumpleanosProximos.sort((a, b) => {
+      if (!a.cumpleanos || !b.cumpleanos) return 0;
+
+      const fechaA = new Date(a.cumpleanos);
+      const fechaB = new Date(b.cumpleanos);
+
+      // Comparar considerando el año actual
+      const hoy = new Date();
+      const cumpleA = new Date(hoy.getFullYear(), fechaA.getMonth(), fechaA.getDate());
+      const cumpleB = new Date(hoy.getFullYear(), fechaB.getMonth(), fechaB.getDate());
+
+      if (cumpleA < hoy) cumpleA.setFullYear(hoy.getFullYear() + 1);
+      if (cumpleB < hoy) cumpleB.setFullYear(hoy.getFullYear() + 1);
+
+      return cumpleA.getTime() - cumpleB.getTime();
+    });
+  }
 }
