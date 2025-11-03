@@ -27,34 +27,31 @@ export class DetalleSeguroAutoController {
       'ejemplo-basico': {
         summary: 'Ejemplo de creación básica',
         value: {
-          lead_id: '123e4567-e89b-12d3-a456-426614174000',
-          marca_auto: 'Toyota',
-          ano_auto: 2020,
-          modelo_auto: 'Corolla',
-          placa_auto: 'ABC-123',
-          tipo_uso: 'particular'
+          id_lead: '123e4567-e89b-12d3-a456-426614174000',
+          marca: 'Toyota',
+          modelo: 'Corolla',
+          anio: 2020,
+          placa: 'ABC-123',
+          uso_vehiculo: 'Particular'
         }
       },
-      'ejemplo-comercial': {
-        summary: 'Ejemplo para uso comercial',
+      'ejemplo-completo': {
+        summary: 'Ejemplo con todos los campos',
         value: {
-          lead_id: '456e7890-e89b-12d3-a456-426614174001',
-          marca_auto: 'Mercedes-Benz',
-          ano_auto: 2019,
-          modelo_auto: 'Sprinter',
-          placa_auto: 'XYZ-789',
-          tipo_uso: 'comercial'
-        }
-      },
-      'ejemplo-libre': {
-        summary: 'Ejemplo con tipo de uso libre (cualquier valor)',
-        value: {
-          lead_id: '789e0123-e89b-12d3-a456-426614174002',
-          marca_auto: 'Ford',
-          ano_auto: 2021,
-          modelo_auto: 'Ranger',
-          placa_auto: 'DEF-456',
-          tipo_uso: 'Trabajo diario'
+          id_lead: '456e7890-e89b-12d3-a456-426614174001',
+          marca: 'Mercedes-Benz',
+          modelo: 'Sprinter',
+          anio: 2019,
+          placa: 'XYZ-789',
+          valor_vehiculo: 45000,
+          tipo_cobertura: 'Todo riesgo',
+          zona_riesgo: 'Media',
+          antiguedad_licencia: 5,
+          tiene_gps: true,
+          tiene_alarma: true,
+          numero_siniestros_previos: 0,
+          esta_financiado: false,
+          uso_vehiculo: 'Comercial'
         }
       }
     }
@@ -64,15 +61,23 @@ export class DetalleSeguroAutoController {
     description: 'Detalle creado exitosamente',
     schema: {
       example: {
-        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        lead_id: '123e4567-e89b-12d3-a456-426614174000',
-        marca_auto: 'Toyota',
-        ano_auto: 2020,
-        modelo_auto: 'Corolla',
-        placa_auto: 'ABC-123',
-        tipo_uso: 'particular',
+        id_detalle_auto: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        id_lead: '123e4567-e89b-12d3-a456-426614174000',
+        marca: 'Toyota',
+        modelo: 'Corolla',
+        anio: 2020,
+        placa: 'ABC-123',
+        valor_vehiculo: 25000,
+        tipo_cobertura: 'Todo riesgo',
+        zona_riesgo: 'Media',
+        antiguedad_licencia: null,
+        tiene_gps: true,
+        tiene_alarma: true,
+        numero_siniestros_previos: 0,
+        esta_financiado: false,
+        uso_vehiculo: 'Particular',
+        esta_activo: true,
         fecha_creacion: '2025-10-15T10:00:00.000Z',
-        fecha_actualizacion: '2025-10-15T10:00:00.000Z',
         lead: {
           id_lead: '123e4567-e89b-12d3-a456-426614174000',
           nombre: 'Juan',
@@ -306,18 +311,19 @@ export class DetalleSeguroAutoController {
       'actualizar-parcial': {
         summary: 'Actualización parcial de datos',
         value: {
-          marca_auto: 'Honda',
-          modelo_auto: 'Civic'
+          marca: 'Honda',
+          modelo: 'Civic'
         }
       },
       'actualizar-completo': {
         summary: 'Actualización completa',
         value: {
-          marca_auto: 'Ford',
-          ano_auto: 2021,
-          modelo_auto: 'Focus',
-          placa_auto: 'DEF-456',
-          tipo_uso: 'Transporte de pasajeros'
+          marca: 'Ford',
+          modelo: 'Focus',
+          anio: 2021,
+          valor_vehiculo: 30000,
+          tipo_cobertura: 'Terceros completo',
+          uso_vehiculo: 'Comercial'
         }
       }
     }

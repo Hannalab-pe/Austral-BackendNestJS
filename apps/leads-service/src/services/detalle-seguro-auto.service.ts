@@ -19,16 +19,16 @@ export class DetalleSeguroAutoService {
   async create(createDto: CreateDetalleSeguroAutoDto): Promise<DetalleSeguroAutoResponseDto> {
     // Verificar que el lead existe
     const lead = await this.leadRepository.findOne({
-      where: { idLead: createDto.lead_id },
+      where: { idLead: createDto.id_lead },
     });
 
     if (!lead) {
-      throw new NotFoundException(`Lead con ID ${createDto.lead_id} no encontrado`);
+      throw new NotFoundException(`Lead con ID ${createDto.id_lead} no encontrado`);
     }
 
     // Verificar que no exista ya un detalle para este lead
     const existingDetalle = await this.detalleRepository.findOne({
-      where: { lead_id: createDto.lead_id },
+      where: { id_lead: createDto.id_lead },
     });
 
     if (existingDetalle) {
@@ -52,7 +52,7 @@ export class DetalleSeguroAutoService {
 
   async findOne(id: string): Promise<DetalleSeguroAutoResponseDto> {
     const detalle = await this.detalleRepository.findOne({
-      where: { id },
+      where: { id_detalle_auto: id },
       relations: ['lead'],
     });
 
@@ -65,7 +65,7 @@ export class DetalleSeguroAutoService {
 
   async findByLeadId(leadId: string): Promise<DetalleSeguroAutoResponseDto | null> {
     const detalle = await this.detalleRepository.findOne({
-      where: { lead_id: leadId },
+      where: { id_lead: leadId },
       relations: ['lead'],
     });
 
@@ -78,7 +78,7 @@ export class DetalleSeguroAutoService {
 
   async update(id: string, updateDto: UpdateDetalleSeguroAutoDto): Promise<DetalleSeguroAutoResponseDto> {
     const detalle = await this.detalleRepository.findOne({
-      where: { id },
+      where: { id_detalle_auto: id },
     });
 
     if (!detalle) {
@@ -91,7 +91,7 @@ export class DetalleSeguroAutoService {
 
   async remove(id: string): Promise<void> {
     const detalle = await this.detalleRepository.findOne({
-      where: { id },
+      where: { id_detalle_auto: id },
     });
 
     if (!detalle) {
@@ -102,20 +102,28 @@ export class DetalleSeguroAutoService {
   }
 
   async removeByLeadId(leadId: string): Promise<void> {
-    await this.detalleRepository.delete({ lead_id: leadId });
+    await this.detalleRepository.delete({ id_lead: leadId });
   }
 
   private mapToResponseDto(detalle: DetalleSeguroAuto): DetalleSeguroAutoResponseDto {
     const response = new DetalleSeguroAutoResponseDto();
-    response.id = detalle.id;
-    response.lead_id = detalle.lead_id;
-    response.marca_auto = detalle.marca_auto;
-    response.ano_auto = detalle.ano_auto;
-    response.modelo_auto = detalle.modelo_auto;
-    response.placa_auto = detalle.placa_auto;
-    response.tipo_uso = detalle.tipo_uso;
+    response.id_detalle_auto = detalle.id_detalle_auto;
+    response.id_lead = detalle.id_lead;
+    response.marca = detalle.marca;
+    response.modelo = detalle.modelo;
+    response.anio = detalle.anio;
+    response.placa = detalle.placa;
+    response.valor_vehiculo = detalle.valor_vehiculo;
+    response.tipo_cobertura = detalle.tipo_cobertura;
+    response.zona_riesgo = detalle.zona_riesgo;
+    response.antiguedad_licencia = detalle.antiguedad_licencia;
+    response.tiene_gps = detalle.tiene_gps;
+    response.tiene_alarma = detalle.tiene_alarma;
+    response.numero_siniestros_previos = detalle.numero_siniestros_previos;
+    response.esta_financiado = detalle.esta_financiado;
+    response.uso_vehiculo = detalle.uso_vehiculo;
+    response.esta_activo = detalle.esta_activo;
     response.fecha_creacion = detalle.fecha_creacion;
-    response.fecha_actualizacion = detalle.fecha_actualizacion;
 
     if (detalle.lead) {
       response.lead = {

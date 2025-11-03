@@ -56,6 +56,19 @@ export class LeadsService {
     });
   }
 
+  async findOne(id: string): Promise<Lead> {
+    const lead = await this.leadRepository.findOne({
+      where: { idLead: id, esta_activo: true },
+      relations: ['estado', 'fuente'],
+    });
+
+    if (!lead) {
+      throw new BadRequestException('Lead no encontrado');
+    }
+
+    return lead;
+  }
+
   async update(id: string, updateData: Partial<Lead>): Promise<Lead> {
     const lead = await this.leadRepository.findOne({
       where: { idLead: id, esta_activo: true },
