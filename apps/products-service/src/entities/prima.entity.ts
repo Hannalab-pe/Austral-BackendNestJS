@@ -1,3 +1,4 @@
+import { AvisoCobranza } from './aviso-cobranza.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
@@ -24,6 +26,10 @@ export class Prima {
   @ManyToOne(() => Poliza, (poliza) => poliza.primas, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_poliza' })
   poliza: Poliza;
+
+  // Relación con avisos de cobranza
+  @OneToMany(() => AvisoCobranza, (aviso) => aviso.prima)
+  avisosCobranza: AvisoCobranza[];
 
   @Column({ type: 'numeric', precision: 12, scale: 2, name: 'monto' })
   monto: number;

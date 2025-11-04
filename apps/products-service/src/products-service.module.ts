@@ -13,7 +13,15 @@ import {
   ProductosSeguroService,
   PolizaService,
 } from './services';
-import { TipoSeguro, CompaniaSeguro, ProductoSeguro, Poliza } from './entities';
+import {
+  TipoSeguro,
+  CompaniaSeguro,
+  ProductoSeguro,
+  Poliza,
+  Prima,
+  Siniestro,
+} from './entities';
+import { AvisoCobranza } from './entities/aviso-cobranza.entity';
 
 @Module({
   imports: [
@@ -29,13 +37,29 @@ import { TipoSeguro, CompaniaSeguro, ProductoSeguro, Poliza } from './entities';
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'austral_seguros'),
-        entities: [TipoSeguro, CompaniaSeguro, ProductoSeguro, Poliza],
-        synchronize: false, // Desactivado - usar migraciones o scripts SQL
+        entities: [
+          TipoSeguro,
+          CompaniaSeguro,
+          ProductoSeguro,
+          Poliza,
+          Prima,
+          Siniestro,
+          AvisoCobranza,
+        ],
+        synchronize: configService.get('NODE_ENV') === 'development',
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([TipoSeguro, CompaniaSeguro, ProductoSeguro, Poliza]),
+    TypeOrmModule.forFeature([
+      TipoSeguro,
+      CompaniaSeguro,
+      ProductoSeguro,
+      Poliza,
+      Prima,
+      Siniestro,
+      AvisoCobranza,
+    ]),
   ],
   controllers: [
     TiposSegurosController,

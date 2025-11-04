@@ -1,3 +1,8 @@
+export enum EstadoAvisoCobranza {
+  PENDIENTE = 'PENDIENTE',
+  PAGADO = 'PAGADO',
+  VENCIDO = 'VENCIDO',
+}
 export enum PrimaEstado {
   PENDIENTE = 'PENDIENTE',
   PAGADA = 'PAGADA',

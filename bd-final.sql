@@ -8,6 +8,7 @@ CREATE TABLE prima (
 	estado varchar(20) DEFAULT 'PENDIENTE', -- PENDIENTE, PAGADA, VENCIDA
 	observaciones text NULL,
 	fecha_creacion timestamp DEFAULT now() NULL,
+	fecha_actualizacion timestamp NULL,
 	CONSTRAINT prima_id_poliza_fkey FOREIGN KEY (id_poliza) REFERENCES poliza(id_poliza) ON DELETE CASCADE
 );
 CREATE INDEX idx_prima_poliza ON prima(id_poliza);
@@ -25,6 +26,7 @@ CREATE TABLE siniestro (
 	estado varchar(20) DEFAULT 'REPORTADO', -- REPORTADO, EN_PROCESO, CERRADO, RECHAZADO
 	observaciones text NULL,
 	fecha_reporte timestamp DEFAULT now() NULL,
+	fecha_actualizacion timestamp NULL,
 	fecha_cierre timestamp NULL,
 	CONSTRAINT siniestro_id_poliza_fkey FOREIGN KEY (id_poliza) REFERENCES poliza(id_poliza) ON DELETE CASCADE
 );
