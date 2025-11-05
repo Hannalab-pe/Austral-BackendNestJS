@@ -9,10 +9,12 @@ import { RolesController } from './controllers/roles.controller';
 import { UsuariosController } from './controllers/usuarios.controller';
 import { PermisosController } from './controllers/permisos.controller';
 import { AuditoriaController } from './controllers/auditoria.controller';
+import { VendedoresController } from './controllers/vendedores.controller';
 import { RolesService } from './services/roles.service';
 import { UsuariosService } from './services/usuarios.service';
 import { PermisosService } from './services/permisos.service';
 import { AuditoriaService } from './services/auditoria.service';
+import { VendedoresService } from './services/vendedores.service';
 import { Usuario, Rol, Vista, Permiso, RolVista, RolPermisoVista, Auditoria, BrokerVendedor } from './entities';
 import { JwtStrategy } from './strategies';
 
@@ -48,8 +50,8 @@ import { JwtStrategy } from './strategies';
       }),
     }),
   ],
-  controllers: [AuthServiceController, RolesController, UsuariosController, PermisosController, AuditoriaController],
-  providers: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, JwtStrategy],
-  exports: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, JwtModule],
+  controllers: [AuthServiceController, RolesController, UsuariosController, PermisosController, AuditoriaController, VendedoresController],
+  providers: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, VendedoresService, JwtStrategy],
+  exports: [AuthServiceService, RolesService, UsuariosService, PermisosService, AuditoriaService, VendedoresService, JwtModule],
 })
 export class AuthServiceModule { }

@@ -1,3 +1,19 @@
+-- Tabla de avisos de cobranza
+CREATE TABLE aviso_cobranza (
+	id_aviso_cobranza uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	id_prima uuid NOT NULL,
+	fecha_vencimiento date NOT NULL,
+	monto numeric(12,2) NOT NULL,
+	estado varchar(20) DEFAULT 'pendiente', -- pendiente, pagado, vencido
+	fecha_pago date NULL,
+	observaciones text NULL,
+	fecha_creacion timestamp DEFAULT now() NULL,
+	fecha_actualizacion timestamp NULL,
+	CONSTRAINT aviso_cobranza_id_prima_fkey FOREIGN KEY (id_prima) REFERENCES prima(id_prima) ON DELETE CASCADE
+);
+CREATE INDEX idx_aviso_prima ON aviso_cobranza(id_prima);
+CREATE INDEX idx_aviso_estado ON aviso_cobranza(estado);
+
 -- Tabla de primas
 CREATE TABLE prima (
 	id_prima uuid DEFAULT gen_random_uuid() PRIMARY KEY,
