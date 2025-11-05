@@ -3,7 +3,7 @@ import { AuthProxyService } from '../services/auth-proxy.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authProxyService: AuthProxyService) {}
+  constructor(private readonly authProxyService: AuthProxyService) { }
 
   @Post('login')
   async login(@Body() loginData: any) {

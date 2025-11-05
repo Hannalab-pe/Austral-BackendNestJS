@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, Min, Max, Length } from 'class-validator';
+import { IsOptional, IsString, IsNumber, Min, Max, Length } from 'class-validator';
 
 export class UpdateVendedorDto {
     @ApiProperty({
@@ -7,6 +7,7 @@ export class UpdateVendedorDto {
         example: 'vendedor1',
         required: false,
     })
+    @IsOptional()
     @IsString()
     @Length(3, 50)
     nombreUsuario?: string;
@@ -16,6 +17,7 @@ export class UpdateVendedorDto {
         example: 'vendedor@austral.com',
         required: false,
     })
+    @IsOptional()
     @IsString()
     @Length(1, 255)
     email?: string;
@@ -25,6 +27,7 @@ export class UpdateVendedorDto {
         example: '+54 11 1234-5678',
         required: false,
     })
+    @IsOptional()
     @IsString()
     @Length(1, 20)
     telefono?: string;
@@ -36,6 +39,7 @@ export class UpdateVendedorDto {
         maximum: 100,
         required: false,
     })
+    @IsOptional()
     @IsNumber({ maxDecimalPlaces: 2 })
     @Min(0)
     @Max(100)
